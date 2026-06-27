@@ -97,12 +97,30 @@ class NoteComponent extends PositionComponent
         ..strokeWidth = 1.5,
     );
 
-    // Etichetta (solfège/lettere/nessuna) accanto alla nota.
+    // Etichetta (solfège/lettere) accanto alla nota: include già il '#'.
     final String label =
         GameConfig.labelForClass(note.noteClass, game.settings.labelMode);
     if (label.isNotEmpty) {
       _text(canvas, label, const Offset(0, 16), c.withValues(alpha: alpha));
+    } else if (GameConfig.isBlackClass(note.noteClass)) {
+      // Etichette spente: il diesis resta come alterazione (notazione musicale).
+      _drawSharp(canvas, Colors.white.withValues(alpha: 0.95 * alpha));
     }
+  }
+
+  /// Disegna un simbolo di diesis (♯) vettoriale a sinistra della nota.
+  void _drawSharp(Canvas canvas, Color color) {
+    final Paint stroke = Paint()
+      ..color = color
+      ..strokeWidth = 1.6
+      ..strokeCap = StrokeCap.round;
+    const double x = -16; // a sinistra della testa, come da notazione
+    // Due aste verticali.
+    canvas.drawLine(const Offset(x - 2, -8), const Offset(x - 2, 7), stroke);
+    canvas.drawLine(const Offset(x + 2, -7), const Offset(x + 2, 8), stroke);
+    // Due traverse leggermente ascendenti.
+    canvas.drawLine(const Offset(x - 5, -2), const Offset(x + 5, -4), stroke);
+    canvas.drawLine(const Offset(x - 5, 4), const Offset(x + 5, 2), stroke);
   }
 
   /// Disegna un taglio addizionale solo se la nota cade su una linea fuori dal
