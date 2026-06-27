@@ -97,6 +97,26 @@ Per abilitarli, metti i campioni in `assets/audio/` con i nomi indicati nel
 
 ---
 
+## Pubblicazione web (GitHub Pages)
+
+Il repo include un workflow GitHub Actions
+([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)) che, ad ogni
+push sul branch di default, builda la web app e la pubblica su GitHub Pages.
+
+**Setup una-tantum** (necessario perché il token delle Actions non può abilitare
+Pages da solo):
+
+1. Vai su **Settings → Pages** del repository.
+2. In **Build and deployment → Source** scegli **GitHub Actions**.
+3. Rilancia il workflow: tab **Actions → Deploy web su GitHub Pages → Run
+   workflow** (oppure fai un nuovo push).
+
+Al termine il gioco sarà online su:
+`https://ianes1978.github.io/Battle-Hymn/`
+
+> Il `base-href` nel workflow è impostato a `/Battle-Hymn/`; se rinomini il repo,
+> aggiornalo di conseguenza.
+
 ## Struttura del progetto
 
 ```

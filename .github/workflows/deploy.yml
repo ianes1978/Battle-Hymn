@@ -55,10 +55,10 @@ jobs:
       - name: Build web (release)
         run: flutter build web --release --base-href "/Battle-Hymn/"
 
+      # Richiede che GitHub Pages sia già abilitato nelle impostazioni del repo
+      # con "Source: GitHub Actions" (operazione una-tantum, vedi README).
       - name: Configura Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Carica l'artifact del sito
         uses: actions/upload-pages-artifact@v3
