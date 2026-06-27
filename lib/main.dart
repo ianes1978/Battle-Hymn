@@ -10,10 +10,10 @@ import 'ui/pause_overlay.dart';
 /// Punto di ingresso dell'applicazione.
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // Forza l'orientamento orizzontale su mobile (il layout è pensato in wide).
+  // Orientamento verticale (portrait) su mobile.
   SystemChrome.setPreferredOrientations([
-    DeviceOrientation.landscapeLeft,
-    DeviceOrientation.landscapeRight,
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
   ]);
 
   final BattleHymnGame game = BattleHymnGame();
