@@ -33,16 +33,17 @@ class AudioManager {
       final double freq = _baseFreq * pow(2, i / 12).toDouble();
       _noteWavs.add(_buildToneWav(freq));
     }
-    for (int i = 0; i < 8; i++) {
+    // Pool ampio: pressioni rapide + base ritmica non si rubano i canali.
+    for (int i = 0; i < 16; i++) {
       final AudioPlayer p = AudioPlayer();
       await p.setReleaseMode(ReleaseMode.stop);
       _pool.add(p);
     }
 
-    // Base ritmica.
+    // Base ritmica (pool dedicato, separato dalle note).
     _kick = _buildKickWav();
     _hat = _buildHatWav();
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 6; i++) {
       final AudioPlayer p = AudioPlayer();
       await p.setReleaseMode(ReleaseMode.stop);
       _drumPool.add(p);
