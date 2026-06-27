@@ -14,8 +14,8 @@ dependencies:
 
   # Motore di gioco 2D
   flame: ^1.18.0
-  # Audio per note di pianoforte e musica di sottofondo
-  flame_audio: ^2.10.1
+  # Riproduzione audio (qui usata per i toni delle note sintetizzati a runtime)
+  audioplayers: ^6.0.0
 
 dev_dependencies:
   flutter_test:

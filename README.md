@@ -100,16 +100,15 @@ bianchi: A   S   D   F   G   H   J   K   (Do Re Mi Fa Sol La Si Do²)
 
 ---
 
-## Audio (opzionale)
+## Audio
 
-Il gioco gira **anche senza audio**: i suoni vengono caricati in modo
-crash-free e, se i file mancano, restano semplicemente disattivati.
+I suoni delle note sono **sintetizzati a runtime** (toni generati via codice,
+uno per ciascuna delle 12 note): non serve alcun file e non c'è materiale
+protetto da copyright. Partono al primo tasto/tocco (i browser richiedono un
+gesto utente per l'audio). Per ora **non** c'è musica di sottofondo.
 
-Per abilitarli, metti i campioni in `assets/audio/` con i nomi indicati nel
-[README della cartella](assets/audio/README.md):
-`note_0.wav` … `note_7.wav` (le note) e, opzionalmente, `bgm.mp3` (musica).
-
-> Usa solo asset liberi (CC0 / Public Domain) o creati da te.
+> Nota: i campioni di pianoforte CC0 in `assets/audio/` non sono più necessari;
+> la cartella resta disponibile per un eventuale uso futuro.
 
 ---
 
