@@ -62,14 +62,17 @@ void main() {
       expect(s.hp, lessThan(GameConfig.maxHp));
     });
 
-    test('con una vita, a 0 HP si continua', () {
+    test('con una vita si sopravvive alla prima morte', () {
       final s = GameState()..lives = 1;
-      for (int i = 0; i < 100; i++) {
+      // Miss sufficienti a portare l'HP a 0 una volta sola.
+      final int missesToDie = (GameConfig.maxHp / GameConfig.missDamage).ceil();
+      for (int i = 0; i < missesToDie; i++) {
         s.registerMiss();
       }
-      // La vita è stata consumata ma non è game over.
+      // La vita è stata consumata, l'HP ripristinato, niente game over.
       expect(s.isGameOver, isFalse);
-      expect(s.lives, lessThan(1));
+      expect(s.lives, 0);
+      expect(s.hp, GameConfig.maxHp);
     });
 
     test('senza vite, HP a 0 è game over', () {
