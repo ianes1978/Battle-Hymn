@@ -12,7 +12,8 @@ class KeyMapping {
   KeyMapping._();
 
   /// Tasto fisico → classe di nota (0..11).
-  static const Map<LogicalKeyboardKey, int> _keyToClass = {
+  /// (final, non const: LogicalKeyboardKey non ha "primitive equality".)
+  static final Map<LogicalKeyboardKey, int> _keyToClass = {
     LogicalKeyboardKey.keyA: 0, // Do
     LogicalKeyboardKey.keyW: 1, // Do#
     LogicalKeyboardKey.keyS: 2, // Re
