@@ -1,0 +1,32 @@
+name: battle_hymn
+description: "Battle Hymn - un rhythm bullet-heaven costruito con Flutter e Flame."
+publish_to: 'none'
+
+# Versione del gioco (semver+build)
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Motore di gioco 2D
+  flame: ^1.18.0
+  # Audio per note di pianoforte e musica di sottofondo
+  flame_audio: ^2.10.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Cartelle asset: i file vanno aggiunti dall'utente (vedi i README dedicati).
+  # La registrazione delle cartelle è valida anche se contengono solo i README.
+  assets:
+    - assets/audio/
+    - assets/images/

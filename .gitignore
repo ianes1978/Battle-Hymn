@@ -1,0 +1,28 @@
+# File generati da Flutter/Dart
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+pubspec.lock
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Piattaforme generate da `flutter create .` (rigenerabili)
+# Decommenta se NON vuoi versionarle:
+# android/
+# ios/
+# linux/
+# macos/
+# windows/
+# web/
