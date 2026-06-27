@@ -24,15 +24,19 @@ void main() {
       debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.black,
-        body: GameWidget<BattleHymnGame>(
-          game: game,
-          // Overlay attivi all'avvio (mostra il menu).
-          initialActiveOverlays: const [Overlays.menu],
-          overlayBuilderMap: {
-            Overlays.menu: (context, g) => MenuOverlay(game: g),
-            Overlays.pause: (context, g) => PauseOverlay(game: g),
-            Overlays.gameOver: (context, g) => GameOverOverlay(game: g),
-          },
+        // SafeArea: il gioco resta dentro l'area visibile (sotto la status bar
+        // e sopra i pulsanti di navigazione), così non sborda né viene coperto.
+        body: SafeArea(
+          child: GameWidget<BattleHymnGame>(
+            game: game,
+            // Overlay attivi all'avvio (mostra il menu).
+            initialActiveOverlays: const [Overlays.menu],
+            overlayBuilderMap: {
+              Overlays.menu: (context, g) => MenuOverlay(game: g),
+              Overlays.pause: (context, g) => PauseOverlay(game: g),
+              Overlays.gameOver: (context, g) => GameOverOverlay(game: g),
+            },
+          ),
         ),
       ),
     ),
