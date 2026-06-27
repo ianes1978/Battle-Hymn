@@ -64,7 +64,8 @@ class _MenuOverlayState extends State<MenuOverlay> {
             _label('Velocità'),
             _segment<double>(
               current: settings.speed,
-              options: const {
+              // niente 'const': le chiavi double non hanno primitive equality.
+              options: {
                 0.6: 'Lento',
                 1.0: 'Normale',
                 1.4: 'Veloce',
