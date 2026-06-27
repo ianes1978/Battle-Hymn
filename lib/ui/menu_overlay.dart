@@ -60,6 +60,19 @@ class _MenuOverlayState extends State<MenuOverlay> {
             ),
             const SizedBox(height: 14),
 
+            // --- Opzione: velocità / tempo ---
+            _label('Velocità'),
+            _segment<double>(
+              current: settings.speed,
+              options: const {
+                0.6: 'Lento',
+                1.0: 'Normale',
+                1.4: 'Veloce',
+              },
+              onSelect: (v) => setState(() => settings.speed = v),
+            ),
+            const SizedBox(height: 14),
+
             // --- Opzione: colori tastiera ---
             _label('Colori tastiera'),
             _segment<bool>(

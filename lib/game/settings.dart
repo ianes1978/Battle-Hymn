@@ -18,4 +18,8 @@ class GameSettings {
   /// Se true la tastiera usa i colori-elemento; se false resta bianca/nera
   /// (note e nemici restano comunque colorati).
   bool keyboardColors = true;
+
+  /// Moltiplicatore di velocità/tempo scelto prima della partita.
+  /// < 1 rallenta (più facile), > 1 accelera. 1.0 = normale.
+  double speed = 1.0;
 }

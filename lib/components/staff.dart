@@ -92,61 +92,71 @@ class Staff extends Component with HasGameReference<BattleHymnGame> {
     );
   }
 
-  /// Disegna una chiave di violino stilizzata (vettoriale) sul lato sinistro,
-  /// con la spirale attorno alla linea del Sol (2ª dal basso).
+  /// Disegna una chiave di violino (Sol) come un UNICO tratto continuo:
+  /// spirale centrale (scroll) attorno alla linea del Sol → risale formando
+  /// l'ansa in cima → ridiscende come spina fino sotto il rigo, con codino e
+  /// pallino terminale.
   void _drawTrebleClef(Canvas canvas) {
     final double s = GameConfig.staffHeight / 4; // interlinea
     const double top = GameConfig.staffTop;
     final double gLineY = top + 3 * s; // linea del Sol (2ª dal basso)
     final double bottomLineY = top + 4 * s;
-    const double gx = 52;
+    const double cx = 56;
 
     final Paint p = Paint()
-      ..color = Colors.white.withValues(alpha: 0.9)
+      ..color = Colors.white.withValues(alpha: 0.92)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = s * 0.17
+      ..strokeWidth = s * 0.16
       ..strokeCap = StrokeCap.round
       ..strokeJoin = StrokeJoin.round;
 
-    // Spina dorsale: dall'alto del rigo, scende formando la pancia e prosegue
-    // sotto il rigo con la codina.
-    final Path spine = Path()
-      ..moveTo(gx + 0.15 * s, top - 0.9 * s)
-      ..cubicTo(gx + 1.7 * s, top + 0.2 * s, gx + 1.5 * s, gLineY - 0.3 * s,
-          gx, gLineY)
-      ..cubicTo(gx - 1.5 * s, gLineY + 0.3 * s, gx - 1.4 * s, top + 0.7 * s,
-          gx + 0.15 * s, top + 0.4 * s)
-      ..moveTo(gx + 0.15 * s, top - 0.9 * s)
-      ..cubicTo(gx + 0.3 * s, gLineY, gx + 0.2 * s, bottomLineY + 0.6 * s,
-          gx - 0.1 * s, bottomLineY + 1.5 * s)
-      ..cubicTo(gx - 0.3 * s, bottomLineY + 2.0 * s, gx - 0.8 * s,
-          bottomLineY + 1.9 * s, gx - 0.85 * s, bottomLineY + 1.4 * s);
-    canvas.drawPath(spine, p);
+    final double rOuter = 1.05 * s, rInner = 0.12 * s;
+    final Path clef = Path();
 
-    // Spirale (scroll) attorno alla linea del Sol.
-    final Path spiral = Path();
-    const int n = 48;
-    const double turns = 1.6;
-    final double rOuter = 1.2 * s, rInner = 0.12 * s;
+    // 1) Spirale dal centro verso l'esterno, fino a uscire sul lato sinistro.
+    const int n = 80;
+    const double turns = 2.2;
     for (int i = 0; i <= n; i++) {
       final double t = i / n;
-      final double ang = -math.pi / 2 - t * turns * 2 * math.pi;
-      final double r = rOuter + (rInner - rOuter) * t;
-      final double x = gx + r * math.cos(ang);
+      final double ang = math.pi - (1 - t) * turns * 2 * math.pi;
+      final double r = rInner + (rOuter - rInner) * t;
+      final double x = cx + r * math.cos(ang);
       final double y = gLineY + r * math.sin(ang);
       if (i == 0) {
-        spiral.moveTo(x, y);
+        clef.moveTo(x, y);
       } else {
-        spiral.lineTo(x, y);
+        clef.lineTo(x, y);
       }
     }
-    canvas.drawPath(spiral, p);
+    // Punto di uscita della spirale (lato sinistro, ang = π).
+    final double exX = cx - rOuter;
+    final double exY = gLineY;
 
-    // Pallino terminale in fondo alla codina.
+    // 2) Dall'uscita, su e oltre la cima (ansa) verso destra.
+    clef.cubicTo(
+      exX - 0.25 * s, exY - 1.3 * s,
+      cx - 0.2 * s, top - 1.3 * s,
+      cx + 0.18 * s, top - 1.0 * s,
+    );
+    // 3) Ridiscende come spina attraverso il rigo, fino sotto.
+    clef.cubicTo(
+      cx + 0.55 * s, top - 0.1 * s,
+      cx + 0.22 * s, gLineY + 0.4 * s,
+      cx + 0.05 * s, bottomLineY + 0.9 * s,
+    );
+    // 4) Codino con gancio a sinistra.
+    clef.cubicTo(
+      cx - 0.05 * s, bottomLineY + 1.6 * s,
+      cx - 0.55 * s, bottomLineY + 1.95 * s,
+      cx - 0.72 * s, bottomLineY + 1.5 * s,
+    );
+    canvas.drawPath(clef, p);
+
+    // Pallino terminale.
     canvas.drawCircle(
-      Offset(gx - 0.85 * s, bottomLineY + 1.4 * s),
-      s * 0.22,
-      Paint()..color = Colors.white.withValues(alpha: 0.9),
+      Offset(cx - 0.72 * s, bottomLineY + 1.45 * s),
+      s * 0.2,
+      Paint()..color = Colors.white.withValues(alpha: 0.92),
     );
   }
 }

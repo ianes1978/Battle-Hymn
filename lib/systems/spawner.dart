@@ -38,7 +38,8 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
       GameConfig.minSpawnInterval,
       d,
     );
-    _nextInterval = base * (0.8 + _rng.nextDouble() * 0.4);
+    // Velocità scelta dal giocatore: < 1 rallenta (intervalli più lunghi).
+    _nextInterval = base * (0.8 + _rng.nextDouble() * 0.4) / game.settings.speed;
   }
 
   void _spawnBeat() {
@@ -63,11 +64,13 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
     final double angle = (sector + jitter).clamp(pi + 0.08, 2 * pi - 0.08);
 
     final double d = game.state.difficulty;
+    // Più alta la velocità, più breve il tempo per raggiungere la linea.
     final double duration = _lerp(
       GameConfig.initialNoteDuration,
       GameConfig.minNoteDuration,
       d,
-    );
+    ) /
+        game.settings.speed;
 
     game.spawnBeat(NoteData(
       noteClass: noteClass,
