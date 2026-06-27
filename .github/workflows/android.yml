@@ -5,8 +5,8 @@ name: Build APK Android
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - claude/battle-hymn-flutter-game-sopz9h
   workflow_dispatch:
 
 permissions:
@@ -50,11 +50,15 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
           if-no-files-found: error
 
-      - name: Pubblica la Release (solo su tag)
-        if: startsWith(github.ref, 'refs/tags/')
+      # Tenta di creare la Release (il tag v0.1.0 viene creato lato server dal
+      # token). Se i permessi non lo consentono, l'APK resta come artifact.
+      - name: Pubblica la Release
+        continue-on-error: true
         uses: softprops/action-gh-release@v2
         with:
-          name: Battle Hymn ${{ github.ref_name }}
+          tag_name: v0.1.0
+          name: Battle Hymn v0.1.0
+          target_commitish: ${{ github.sha }}
           files: build/app/outputs/flutter-apk/app-release.apk
           body: |
             Prima release giocabile di **Battle Hymn** per Android.
