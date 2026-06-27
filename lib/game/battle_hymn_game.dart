@@ -19,6 +19,7 @@ import '../systems/spawner.dart';
 import 'config.dart';
 import 'game_state.dart';
 import 'note_data.dart';
+import 'settings.dart';
 
 /// Identificatori degli overlay (schermate Flutter sopra il gioco).
 class Overlays {
@@ -31,6 +32,7 @@ class Overlays {
 /// (menu → partita → game over). Tiene separati stato, rendering e input.
 class BattleHymnGame extends FlameGame with KeyboardEvents {
   final GameState state = GameState();
+  final GameSettings settings = GameSettings();
   final AudioManager audio = AudioManager();
 
   late final Wizard wizard;
@@ -40,10 +42,14 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   /// Note/beat attualmente in gioco (fonte di verità per il matching input).
   final List<NoteData> notes = [];
 
+  /// Nota-bersaglio corrente: la più vicina alla linea (va colpita per prima).
+  /// Ricalcolata ogni frame in [update].
+  NoteData? activeTarget;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
-    await audio.init(GameConfig.scaleLength);
+    await audio.init(GameConfig.classCount);
 
     wizard = Wizard();
     keyboard = PianoKeyboard();
@@ -67,6 +73,7 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   void update(double dt) {
     super.update(dt);
     state.update(dt);
+    _recomputeTarget();
 
     // Transizione a game over.
     if (state.isGameOver && !overlays.isActive(Overlays.gameOver)) {
@@ -138,37 +145,51 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
     state.registerMiss();
   }
 
+  /// Ricalcola il bersaglio corrente: la nota attiva più vicina alla linea.
+  void _recomputeTarget() {
+    NoteData? best;
+    for (final NoteData n in notes) {
+      if (n.isActive && (best == null || n.progress > best.progress)) {
+        best = n;
+      }
+    }
+    activeTarget = best;
+  }
+
   // ---------------------------------------------------------------------------
   // Input
   // ---------------------------------------------------------------------------
 
-  /// Suona un pitch: riproduce il suono, illumina il tasto e prova a colpire la
-  /// nota attiva più vicina alla linea con quel pitch.
-  void playPitch(int pitch) {
-    audio.playNote(pitch);
-    keyboard.flash(pitch);
+  /// Suona una classe di nota: riproduce il suono, illumina il tasto e — se
+  /// corrisponde al bersaglio corrente — lo colpisce (in qualunque momento).
+  ///
+  /// Le note vanno colpite in ordine: solo il bersaglio (la nota più vicina
+  /// alla linea) è bersagliabile. Il tempismo non è obbligatorio; se preciso
+  /// (Perfect/Good) assegna una gemma.
+  void playClass(int noteClass) {
+    audio.playNote(noteClass);
+    keyboard.flashClass(noteClass);
 
     if (state.isGameOver || state.isPaused) return;
 
-    // Trova la nota attiva del pitch più vicina alla linea.
-    NoteData? best;
-    for (final NoteData n in notes) {
-      if (n.isActive && n.pitch == pitch) {
-        if (best == null || n.timeRemaining < best.timeRemaining) best = n;
-      }
+    final NoteData? target = activeTarget;
+    if (target == null || target.noteClass != noteClass) {
+      return; // nota sbagliata o nessun bersaglio: nessun effetto
     }
-    if (best == null) return;
 
-    final Judgment j = best.evaluate();
-    if (j == Judgment.none) return; // ancora troppo lontana: nessun effetto
-    _resolveHit(best, j);
+    _resolveHit(target);
   }
 
   /// Risolve un colpo riuscito: distrugge il nemico e lancia la magia.
-  void _resolveHit(NoteData note, Judgment judgment) {
+  void _resolveHit(NoteData note) {
+    final Judgment judgment = note.evaluate();
+    final bool gem =
+        judgment == Judgment.perfect || judgment == Judgment.good;
+
     note.state = BeatState.resolved;
     note.judgment = judgment;
-    state.registerHit(judgment);
+    activeTarget = null;
+    state.registerHit(judgment, gem);
     wizard.cast(note.angle);
 
     // Posizione del nemico colpito, per indirizzare la magia.
@@ -219,10 +240,10 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
       }
     }
 
-    // Note musicali.
-    final int? pitch = KeyMapping.pitchForKey(key);
-    if (pitch != null) {
-      playPitch(pitch);
+    // Note musicali (per classe, ottava-indipendente).
+    final int? noteClass = KeyMapping.classForKey(key);
+    if (noteClass != null) {
+      playClass(noteClass);
       return KeyEventResult.handled;
     }
 

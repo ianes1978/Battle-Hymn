@@ -4,46 +4,40 @@ import 'package:flutter/material.dart';
 
 import '../game/battle_hymn_game.dart';
 import '../game/config.dart';
-import '../input/key_mapping.dart';
 
-/// Tastiera di pianoforte on-screen: tasti bianchi (note naturali) con i tasti
-/// neri (diesis) sovrapposti, esattamente come un pianoforte reale.
+/// Tastiera di pianoforte on-screen: 8 tasti bianchi + 5 neri (un'ottava + Do).
 ///
-/// È un unico componente con [TapCallbacks] che gestisce manualmente il
-/// rilevamento del tocco, così i tasti neri hanno la precedenza su quelli
-/// bianchi sottostanti (niente doppie note quando si preme un nero).
+/// L'input conta per CLASSE di nota: premere un tasto "Do" o "Do²" produce la
+/// stessa nota. Hit-testing manuale così i tasti neri hanno la precedenza.
 class PianoKeyboard extends PositionComponent
     with HasGameReference<BattleHymnGame>, TapCallbacks {
   PianoKeyboard() : super(priority: 30);
 
-  /// Intensità di pressione per ogni pitch (per il feedback luminoso).
+  /// Intensità di pressione per classe di nota (feedback luminoso).
   final List<double> _flash =
-      List<double>.filled(GameConfig.scaleLength, 0, growable: false);
+      List<double>.filled(GameConfig.classCount, 0, growable: false);
 
-  /// Larghezza di un tasto bianco (calcolata in [update]).
   double _whiteWidth = 0;
 
   @override
   void update(double dt) {
     super.update(dt);
-    // Layout responsive: la tastiera occupa tutta la larghezza in basso.
     position = Vector2(0, game.size.y - GameConfig.keyboardHeight);
     size = Vector2(game.size.x, GameConfig.keyboardHeight);
-    _whiteWidth = size.x / GameConfig.whitePitches.length;
+    _whiteWidth = size.x / GameConfig.whiteSlotClasses.length;
 
     for (int i = 0; i < _flash.length; i++) {
       if (_flash[i] > 0) _flash[i] = (_flash[i] - dt * 4).clamp(0, 1);
     }
   }
 
-  /// Evidenzia visivamente il tasto di un pitch (input da tastiera fisica).
-  void flash(int pitch) {
-    if (pitch >= 0 && pitch < _flash.length) _flash[pitch] = 1;
+  /// Evidenzia il tasto di una classe (chiamato anche da tastiera fisica).
+  void flashClass(int noteClass) {
+    final int c = noteClass % 12;
+    if (c >= 0 && c < _flash.length) _flash[c] = 1;
   }
 
-  // ---------------------------------------------------------------------------
-  // Geometria dei tasti (in coordinate locali al componente)
-  // ---------------------------------------------------------------------------
+  // --- Geometria (coordinate locali) ---------------------------------------
 
   Rect _whiteRect(int whiteIndex) =>
       Rect.fromLTWH(whiteIndex * _whiteWidth, 0, _whiteWidth, size.y);
@@ -53,78 +47,67 @@ class PianoKeyboard extends PositionComponent
 
   Rect _blackRect(int leftWhite) {
     final double centerX = (leftWhite + 1) * _whiteWidth;
-    return Rect.fromLTWH(
-      centerX - _blackWidth / 2,
-      0,
-      _blackWidth,
-      _blackHeight,
-    );
+    return Rect.fromLTWH(centerX - _blackWidth / 2, 0, _blackWidth, _blackHeight);
   }
 
-  // ---------------------------------------------------------------------------
-  // Input
-  // ---------------------------------------------------------------------------
+  // --- Input ----------------------------------------------------------------
 
   @override
   void onTapDown(TapDownEvent event) {
     final Offset p = Offset(event.localPosition.x, event.localPosition.y);
 
-    // Prima i tasti neri (stanno sopra).
     if (p.dy <= _blackHeight) {
-      for (final b in GameConfig.blackKeys) {
+      for (final b in GameConfig.blackSlots) {
         if (_blackRect(b.leftWhite).contains(p)) {
-          _press(b.pitch);
+          _press(b.noteClass);
           return;
         }
       }
     }
 
-    // Poi i tasti bianchi.
     final int whiteIndex = (p.dx / _whiteWidth).floor();
-    if (whiteIndex >= 0 && whiteIndex < GameConfig.whitePitches.length) {
-      _press(GameConfig.whitePitches[whiteIndex]);
+    if (whiteIndex >= 0 && whiteIndex < GameConfig.whiteSlotClasses.length) {
+      _press(GameConfig.whiteSlotClasses[whiteIndex]);
     }
   }
 
-  void _press(int pitch) {
-    game.playPitch(pitch);
-    flash(pitch);
+  void _press(int noteClass) {
+    game.playClass(noteClass);
+    flashClass(noteClass);
   }
 
-  // ---------------------------------------------------------------------------
-  // Rendering
-  // ---------------------------------------------------------------------------
+  // --- Rendering ------------------------------------------------------------
 
   @override
   void render(Canvas canvas) {
-    // 1) Tasti bianchi.
-    for (int i = 0; i < GameConfig.whitePitches.length; i++) {
-      final int pitch = GameConfig.whitePitches[i];
-      _drawWhiteKey(canvas, _whiteRect(i), pitch);
-    }
+    final bool colored = game.settings.keyboardColors;
 
-    // 2) Tasti neri sopra.
-    for (final b in GameConfig.blackKeys) {
-      _drawBlackKey(canvas, _blackRect(b.leftWhite), b.pitch);
+    for (int i = 0; i < GameConfig.whiteSlotClasses.length; i++) {
+      _drawWhiteKey(
+          canvas, _whiteRect(i), GameConfig.whiteSlotClasses[i], colored);
+    }
+    for (final b in GameConfig.blackSlots) {
+      _drawBlackKey(canvas, _blackRect(b.leftWhite), b.noteClass, colored);
     }
   }
 
-  void _drawWhiteKey(Canvas canvas, Rect rect, int pitch) {
-    final double press = _flash[pitch];
+  void _drawWhiteKey(Canvas canvas, Rect rect, int noteClass, bool colored) {
+    final double press = _flash[noteClass % 12];
     final RRect rrect = RRect.fromRectAndCorners(
       rect.deflate(1),
       bottomLeft: const Radius.circular(6),
       bottomRight: const Radius.circular(6),
     );
 
-    // Corpo: bianco, si tinge del colore del pitch quando premuto.
-    final Paint fill = Paint()
-      ..color = Color.lerp(
-        const Color(0xFFF7F7F7),
-        GameConfig.colorForPitch(pitch),
-        press * 0.7,
-      )!;
-    canvas.drawRRect(rrect, fill);
+    // Corpo: bianco; da premuto si tinge (se colori attivi) o si scurisce.
+    final Color pressed = colored
+        ? GameConfig.colorForClass(noteClass)
+        : const Color(0xFFBDBDBD);
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..color = Color.lerp(const Color(0xFFF7F7F7), pressed, press * 0.7)!,
+    );
     canvas.drawRRect(
       rrect,
       Paint()
@@ -133,37 +116,37 @@ class PianoKeyboard extends PositionComponent
         ..strokeWidth = 1.2,
     );
 
-    // Pallino del colore-elemento (riferimento per il giocatore).
-    canvas.drawCircle(
-      Offset(rect.center.dx, rect.bottom - 30),
-      5,
-      Paint()..color = GameConfig.colorForPitch(pitch),
-    );
+    // Pallino del colore-elemento (solo se i colori tastiera sono attivi).
+    if (colored) {
+      canvas.drawCircle(Offset(rect.center.dx, rect.bottom - 30), 5,
+          Paint()..color = GameConfig.colorForClass(noteClass));
+    }
 
-    // Etichette: nome nota + tasto fisico.
-    _text(canvas, KeyMapping.keyLabels[pitch],
-        Offset(rect.center.dx, rect.bottom - 16), 13, Colors.black87,
-        bold: true);
-    _text(canvas, GameConfig.scaleNames[pitch],
-        Offset(rect.center.dx, rect.bottom - 46), 10, Colors.black54);
+    // Etichetta (solfège/lettere/nessuna).
+    final String label =
+        GameConfig.labelForClass(noteClass, game.settings.labelMode);
+    if (label.isNotEmpty) {
+      _text(canvas, label, Offset(rect.center.dx, rect.bottom - 16), 13,
+          Colors.black87, bold: true);
+    }
   }
 
-  void _drawBlackKey(Canvas canvas, Rect rect, int pitch) {
-    final double press = _flash[pitch];
+  void _drawBlackKey(Canvas canvas, Rect rect, int noteClass, bool colored) {
+    final double press = _flash[noteClass % 12];
     final RRect rrect = RRect.fromRectAndCorners(
       rect,
       bottomLeft: const Radius.circular(4),
       bottomRight: const Radius.circular(4),
     );
 
-    // Corpo: nero, si illumina del colore del pitch quando premuto.
-    final Paint fill = Paint()
-      ..color = Color.lerp(
-        const Color(0xFF1A1A1A),
-        GameConfig.colorForPitch(pitch),
-        press * 0.85,
-      )!;
-    canvas.drawRRect(rrect, fill);
+    final Color pressed = colored
+        ? GameConfig.colorForClass(noteClass)
+        : const Color(0xFF666666);
+    canvas.drawRRect(
+      rrect,
+      Paint()
+        ..color = Color.lerp(const Color(0xFF1A1A1A), pressed, press * 0.85)!,
+    );
     canvas.drawRRect(
       rrect,
       Paint()
@@ -172,27 +155,21 @@ class PianoKeyboard extends PositionComponent
         ..strokeWidth = 1.2,
     );
 
-    // Pallino del colore-elemento.
-    canvas.drawCircle(
-      Offset(rect.center.dx, rect.bottom - 22),
-      4,
-      Paint()..color = GameConfig.colorForPitch(pitch),
-    );
+    if (colored) {
+      canvas.drawCircle(Offset(rect.center.dx, rect.bottom - 22), 4,
+          Paint()..color = GameConfig.colorForClass(noteClass));
+    }
 
-    // Etichetta del tasto fisico (in chiaro su fondo scuro).
-    _text(canvas, KeyMapping.keyLabels[pitch],
-        Offset(rect.center.dx, rect.bottom - 12), 11, Colors.white,
-        bold: true);
+    final String label =
+        GameConfig.labelForClass(noteClass, game.settings.labelMode);
+    if (label.isNotEmpty) {
+      _text(canvas, label, Offset(rect.center.dx, rect.bottom - 12), 10,
+          Colors.white, bold: true);
+    }
   }
 
-  void _text(
-    Canvas canvas,
-    String s,
-    Offset center,
-    double fontSize,
-    Color color, {
-    bool bold = false,
-  }) {
+  void _text(Canvas canvas, String s, Offset center, double fontSize, Color color,
+      {bool bold = false}) {
     final TextPainter tp = TextPainter(
       text: TextSpan(
         text: s,

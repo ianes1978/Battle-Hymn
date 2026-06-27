@@ -4,8 +4,8 @@ import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
 import '../game/battle_hymn_game.dart';
+import '../game/config.dart';
 import '../game/note_data.dart';
-import '../input/key_mapping.dart';
 
 /// Nemico che avanza radialmente verso il mago. La sua posizione è derivata
 /// dal [NoteData] condiviso con la nota sullo spartito (sincronizzati).
@@ -70,6 +70,29 @@ class Enemy extends PositionComponent with HasGameReference<BattleHymnGame> {
 
   @override
   void render(Canvas canvas) {
+    final bool isTarget = game.activeTarget == note;
+
+    // Anello di evidenziazione del bersaglio corrente (non ruota/scala).
+    if (isTarget && !_dying) {
+      canvas.drawCircle(
+        Offset.zero,
+        26,
+        Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3,
+      );
+      canvas.drawCircle(
+        Offset.zero,
+        26,
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.4)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 7
+          ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+      );
+    }
+
     canvas.save();
     canvas.scale(_scale);
     canvas.rotate(_spin);
@@ -104,10 +127,11 @@ class Enemy extends PositionComponent with HasGameReference<BattleHymnGame> {
 
     canvas.restore();
 
-    // Lettera del tasto da premere (sempre dritta e leggibile, fuori da
-    // rotazione/scala): è il riferimento principale per il giocatore.
+    // Etichetta della nota (solfège/lettere/nessuna), sempre dritta e leggibile.
     if (!_dying) {
-      _drawLabel(canvas, KeyMapping.keyLabels[note.pitch]);
+      final String label =
+          GameConfig.labelForClass(note.noteClass, game.settings.labelMode);
+      if (label.isNotEmpty) _drawLabel(canvas, label);
     }
   }
 

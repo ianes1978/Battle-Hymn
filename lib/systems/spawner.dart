@@ -11,8 +11,6 @@ import '../game/note_data.dart';
 class Spawner extends Component with HasGameReference<BattleHymnGame> {
   final Random _rng = Random();
   double _timer = 0;
-
-  /// Intervallo corrente fino al prossimo spawn.
   double _nextInterval = GameConfig.initialSpawnInterval;
 
   void reset() {
@@ -33,29 +31,33 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
     }
   }
 
-  /// Calcola l'intervallo del prossimo spawn in base alla difficoltà.
   void _scheduleNext() {
-    final double d = game.state.difficulty; // 0..1
+    final double d = game.state.difficulty;
     final double base = _lerp(
       GameConfig.initialSpawnInterval,
       GameConfig.minSpawnInterval,
       d,
     );
-    // Variazione casuale ±20% per evitare un ritmo robotico.
     _nextInterval = base * (0.8 + _rng.nextDouble() * 0.4);
   }
 
-  /// Crea un beat: sceglie pitch (→ direzione/colore) e velocità.
   void _spawnBeat() {
-    final int pitch = _rng.nextInt(GameConfig.scaleLength);
+    // Classe di nota (0..11): conta per l'input.
+    final int noteClass = _rng.nextInt(GameConfig.classCount);
 
-    // Direzione a 360° derivata dal pitch (settori distinti) + piccolo jitter,
-    // così l'altezza della nota resta correlata alla direzione del nemico.
-    final double sector = (pitch / GameConfig.scaleLength) * 2 * pi;
+    // Ottava sullo spartito: 0 (bassa) o 1 (alta), limitando al La alto.
+    int octave = _rng.nextInt(2);
+    int staffIndex = octave * 12 + noteClass;
+    if (staffIndex > GameConfig.staffMax) {
+      octave = 0;
+      staffIndex = noteClass;
+    }
+
+    // Direzione a 360° derivata dalla classe (settori distinti) + jitter.
+    final double sector = (noteClass / GameConfig.classCount) * 2 * pi;
     final double jitter = (_rng.nextDouble() - 0.5) * 0.5;
     final double angle = sector - pi / 2 + jitter;
 
-    // Velocità: le note diventano più rapide con la difficoltà.
     final double d = game.state.difficulty;
     final double duration = _lerp(
       GameConfig.initialNoteDuration,
@@ -63,12 +65,12 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
       d,
     );
 
-    final NoteData note = NoteData(
-      pitch: pitch,
+    game.spawnBeat(NoteData(
+      noteClass: noteClass,
+      staffIndex: staffIndex,
       angle: angle,
       duration: duration,
-    );
-    game.spawnBeat(note);
+    ));
   }
 
   double _lerp(double a, double b, double t) => a + (b - a) * t.clamp(0.0, 1.0);

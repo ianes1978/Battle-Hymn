@@ -1,80 +1,125 @@
 import 'package:flutter/material.dart';
 
 import '../game/battle_hymn_game.dart';
+import '../game/settings.dart';
 
-/// Schermata iniziale: titolo, controlli e pulsante per iniziare.
-class MenuOverlay extends StatelessWidget {
+/// Schermata iniziale: titolo, regole, opzioni (etichette e colori) e GIOCA.
+class MenuOverlay extends StatefulWidget {
   final BattleHymnGame game;
   const MenuOverlay({super.key, required this.game});
 
   @override
-  Widget build(BuildContext context) {
-    return _Panel(
-      children: [
-        const Text(
-          'BATTLE HYMN',
-          style: TextStyle(
-            fontSize: 48,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-            letterSpacing: 4,
-          ),
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'rhythm bullet-heaven',
-          style: TextStyle(fontSize: 16, color: Colors.amberAccent),
-        ),
-        const SizedBox(height: 24),
-        Text(
-          'Premi il tasto mostrato sul nemico quando raggiunge la linea.\n'
-          'Tasti bianchi:  A S D F G H J K\n'
-          'Tasti neri (diesis):  W E  T Y U\n'
-          'Puoi anche cliccare/toccare il pianoforte.  P / ESC = pausa.',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.85)),
-        ),
-        const SizedBox(height: 28),
-        _PlayButton(label: 'GIOCA', onPressed: game.startGame),
-      ],
-    );
-  }
+  State<MenuOverlay> createState() => _MenuOverlayState();
 }
 
-/// Pannello centrato semitrasparente riutilizzato dagli overlay.
-class _Panel extends StatelessWidget {
-  final List<Widget> children;
-  const _Panel({required this.children});
+class _MenuOverlayState extends State<MenuOverlay> {
+  GameSettings get settings => widget.game.settings;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black.withValues(alpha: 0.6),
+      color: Colors.black.withValues(alpha: 0.62),
       alignment: Alignment.center,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: children,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'BATTLE HYMN',
+              style: TextStyle(
+                fontSize: 46,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: 4,
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text('rhythm bullet-heaven',
+                style: TextStyle(fontSize: 16, color: Colors.amberAccent)),
+            const SizedBox(height: 18),
+            Text(
+              'Colpisci la nota EVIDENZIATA premendo il tasto giusto.\n'
+              'Conta la nota, non l\'ottava: un La va bene alto o basso.\n'
+              'A tempo = gemma. 5 gemme = +1 vita. Le note vanno in ordine!',
+              textAlign: TextAlign.center,
+              style:
+                  TextStyle(fontSize: 14, color: Colors.white.withValues(alpha: 0.85)),
+            ),
+            const SizedBox(height: 22),
+
+            // --- Opzione: etichette ---
+            _label('Etichette'),
+            _segment<LabelMode>(
+              current: settings.labelMode,
+              options: const {
+                LabelMode.solfege: 'Do Re Mi',
+                LabelMode.letters: 'C D E',
+                LabelMode.none: 'Nessuna',
+              },
+              onSelect: (v) => setState(() => settings.labelMode = v),
+            ),
+            const SizedBox(height: 14),
+
+            // --- Opzione: colori tastiera ---
+            _label('Colori tastiera'),
+            _segment<bool>(
+              current: settings.keyboardColors,
+              options: const {true: 'ON', false: 'OFF'},
+              onSelect: (v) => setState(() => settings.keyboardColors = v),
+            ),
+            const SizedBox(height: 26),
+
+            ElevatedButton(
+              onPressed: widget.game.startGame,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.amberAccent,
+                foregroundColor: Colors.black,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 44, vertical: 16),
+                textStyle:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              child: const Text('GIOCA'),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-class _PlayButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onPressed;
-  const _PlayButton({required this.label, required this.onPressed});
+  Widget _label(String t) => Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Text(t,
+            style: const TextStyle(color: Colors.white70, fontSize: 13)),
+      );
 
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.amberAccent,
-        foregroundColor: Colors.black,
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-        textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-      ),
-      child: Text(label),
+  /// Selettore "segmentato" generico.
+  Widget _segment<T>({
+    required T current,
+    required Map<T, String> options,
+    required ValueChanged<T> onSelect,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: options.entries.map((e) {
+        final bool selected = e.key == current;
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          child: ElevatedButton(
+            onPressed: () => onSelect(e.key),
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  selected ? Colors.amberAccent : Colors.white24,
+              foregroundColor: selected ? Colors.black : Colors.white,
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+              textStyle: const TextStyle(
+                  fontSize: 15, fontWeight: FontWeight.bold),
+            ),
+            child: Text(e.value),
+          ),
+        );
+      }).toList(),
     );
   }
 }

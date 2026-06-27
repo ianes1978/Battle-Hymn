@@ -6,7 +6,8 @@ Il gioco funziona **senza audio** (i suoni sono opzionali e caricati in modo
 Per abilitare i suoni, inserisci qui i file con questi nomi esatti:
 
 ## Note di pianoforte (campioni)
-Una nota per ogni semitono dell'ottava cromatica (13 file: 8 bianchi + 5 neri):
+Una nota per ogni classe dell'ottava cromatica (12 file). Conta la classe di
+nota, non l'ottava, quindi servono solo questi 12:
 
 ```
 note_0.wav    # Do
@@ -21,7 +22,6 @@ note_8.wav    # Sol#
 note_9.wav    # La
 note_10.wav   # La#
 note_11.wav   # Si
-note_12.wav   # Do (ottava sopra)
 ```
 
 Sono accettati anche `.mp3` / `.ogg`, ma aggiorna l'estensione in

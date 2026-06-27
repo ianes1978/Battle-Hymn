@@ -12,7 +12,6 @@ class NoteComponent extends PositionComponent
     with HasGameReference<BattleHymnGame> {
   final NoteData note;
 
-  /// Timer di dissolvenza dopo risoluzione/miss.
   double _fade = 1;
   bool _resolving = false;
 
@@ -33,24 +32,21 @@ class NoteComponent extends PositionComponent
     }
 
     if (note.isActive) {
-      // Avanza il tempo SOLO qui per evitare doppie avanzate.
-      note.elapsed += dt;
+      note.elapsed += dt; // unico punto in cui avanza il tempo
       if (note.progress >= 1) {
         game.onNoteReachedLine(note);
       }
     }
 
-    // Se non è più attiva (risolta o mancata) inizia la dissolvenza.
     if (!note.isActive && !_resolving) {
       _resolving = true;
     }
 
-    // Posizione X dalla destra verso la linea di esecuzione.
     final double startX = game.size.x + 30;
-    final double endX = GameConfig.judgmentLineX;
+    const double endX = GameConfig.judgmentLineX;
     position = Vector2(
       startX - note.progress * (startX - endX),
-      Staff.yForPitch(note.pitch),
+      Staff.yForStaffIndex(note.staffIndex),
     );
   }
 
@@ -58,24 +54,40 @@ class NoteComponent extends PositionComponent
   void render(Canvas canvas) {
     final Color c = note.color;
     final double alpha = _fade.clamp(0.0, 1.0);
+    final bool isTarget = game.activeTarget == note;
 
-    // Gambo della nota.
-    final Paint stem = Paint()
-      ..color = Colors.white.withValues(alpha: 0.7 * alpha)
-      ..strokeWidth = 2;
-    canvas.drawLine(const Offset(7, 0), const Offset(7, -22), stem);
+    // Tagli addizionali se la nota è fuori dalle 5 linee del pentagramma.
+    _drawLedger(canvas, alpha);
 
-    // Testa della nota (ellisse colorata).
-    final Paint head = Paint()..color = c.withValues(alpha: alpha);
+    // Evidenziazione del bersaglio corrente.
+    if (isTarget) {
+      canvas.drawCircle(
+        Offset.zero,
+        14,
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.9 * alpha)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.5,
+      );
+    }
+
+    // Gambo.
+    canvas.drawLine(
+      const Offset(7, 0),
+      const Offset(7, -22),
+      Paint()
+        ..color = Colors.white.withValues(alpha: 0.7 * alpha)
+        ..strokeWidth = 2,
+    );
+
+    // Testa della nota.
     canvas.save();
     canvas.rotate(-0.3);
     canvas.drawOval(
       Rect.fromCenter(center: Offset.zero, width: 16, height: 12),
-      head,
+      Paint()..color = c.withValues(alpha: alpha),
     );
     canvas.restore();
-
-    // Bordo.
     canvas.drawCircle(
       Offset.zero,
       8,
@@ -84,5 +96,44 @@ class NoteComponent extends PositionComponent
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5,
     );
+
+    // Etichetta (solfège/lettere/nessuna) accanto alla nota.
+    final String label =
+        GameConfig.labelForClass(note.noteClass, game.settings.labelMode);
+    if (label.isNotEmpty) {
+      _text(canvas, label, const Offset(0, 16), c.withValues(alpha: alpha));
+    }
+  }
+
+  /// Disegna brevi tagli addizionali se la nota esce dalle linee principali.
+  void _drawLedger(Canvas canvas, double alpha) {
+    final double y = position.y;
+    final bool above = y < GameConfig.staffTop;
+    final bool below = y > GameConfig.staffTop + GameConfig.staffHeight;
+    if (above || below) {
+      canvas.drawLine(
+        const Offset(-12, 0),
+        const Offset(12, 0),
+        Paint()
+          ..color = Colors.white.withValues(alpha: 0.35 * alpha)
+          ..strokeWidth = 1.5,
+      );
+    }
+  }
+
+  void _text(Canvas canvas, String s, Offset center, Color color) {
+    final TextPainter tp = TextPainter(
+      text: TextSpan(
+        text: s,
+        style: TextStyle(
+          color: color,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+          shadows: const [Shadow(blurRadius: 2, color: Colors.black)],
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(canvas, center - Offset(tp.width / 2, tp.height / 2));
   }
 }

@@ -4,17 +4,19 @@ import 'package:flutter/material.dart';
 import '../game/battle_hymn_game.dart';
 import '../game/config.dart';
 
-/// Pentagramma (5 linee orizzontali) con la linea di esecuzione verticale a
-/// sinistra, dove le note vanno "suonate".
+/// Pentagramma con la linea di esecuzione. Le note coprono 2 ottave distribuite
+/// su una banda verticale più ampia delle 5 linee principali (le note fuori
+/// dalle linee usano tagli addizionali, disegnati dalla nota stessa).
 class Staff extends Component with HasGameReference<BattleHymnGame> {
   Staff() : super(priority: 20);
 
-  /// Calcola la coordinata Y sul pentagramma per un dato pitch.
-  /// Pitch alto = più in alto sullo spartito.
-  static double yForPitch(int pitch) {
-    final double t = pitch / (GameConfig.scaleLength - 1); // 0..1
-    const double top = GameConfig.staffTop;
-    const double bottom = GameConfig.staffTop + GameConfig.staffHeight;
+  /// Coordinata Y per un dato indice di rigo (0 = Do basso ... 21 = La alto).
+  /// Indice alto = più in alto (Y minore).
+  static double yForStaffIndex(int staffIndex) {
+    final double t =
+        (staffIndex - GameConfig.staffMin) / (GameConfig.staffSpan - 1);
+    final double top = GameConfig.noteBandTop;
+    final double bottom = GameConfig.noteBandBottom;
     return bottom - t * (bottom - top);
   }
 
@@ -24,13 +26,17 @@ class Staff extends Component with HasGameReference<BattleHymnGame> {
     const double top = GameConfig.staffTop;
     const double height = GameConfig.staffHeight;
 
-    // Pannello semitrasparente dietro il pentagramma.
-    final Paint panel = Paint()..color = Colors.black.withValues(alpha: 0.18);
-    canvas.drawRect(Rect.fromLTWH(0, top - 18, width, height + 36), panel);
+    // Pannello semitrasparente dietro la banda delle note.
+    final Paint panel = Paint()..color = Colors.black.withValues(alpha: 0.16);
+    canvas.drawRect(
+      Rect.fromLTWH(0, GameConfig.noteBandTop - 8, width,
+          GameConfig.noteBandBottom - GameConfig.noteBandTop + 16),
+      panel,
+    );
 
-    // Le 5 linee del pentagramma.
+    // Le 5 linee principali del pentagramma.
     final Paint linePaint = Paint()
-      ..color = Colors.white.withValues(alpha: 0.25)
+      ..color = Colors.white.withValues(alpha: 0.22)
       ..strokeWidth = 1.5;
     for (int i = 0; i < 5; i++) {
       final double y = top + height * (i / 4);
@@ -46,7 +52,9 @@ class Staff extends Component with HasGameReference<BattleHymnGame> {
     final Paint core = Paint()
       ..color = Colors.amberAccent
       ..strokeWidth = 2.5;
-    canvas.drawLine(Offset(x, top - 20), Offset(x, top + height + 20), glow);
-    canvas.drawLine(Offset(x, top - 20), Offset(x, top + height + 20), core);
+    final double yTop = GameConfig.noteBandTop - 6;
+    final double yBot = GameConfig.noteBandBottom + 6;
+    canvas.drawLine(Offset(x, yTop), Offset(x, yBot), glow);
+    canvas.drawLine(Offset(x, yTop), Offset(x, yBot), core);
   }
 }

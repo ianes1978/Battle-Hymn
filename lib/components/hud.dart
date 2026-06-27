@@ -6,8 +6,7 @@ import '../game/config.dart';
 import '../game/game_state.dart';
 import '../game/note_data.dart';
 
-/// Interfaccia di gioco: barra HP, punteggio, combo, timer di sopravvivenza e
-/// popup dei giudizi (Perfect/Good/Miss).
+/// Interfaccia di gioco: HP, vite, gemme, punteggio, combo, timer, giudizi.
 class Hud extends Component with HasGameReference<BattleHymnGame> {
   Hud() : super(priority: 40);
 
@@ -17,6 +16,8 @@ class Hud extends Component with HasGameReference<BattleHymnGame> {
     final double w = game.size.x;
 
     _drawHpBar(canvas, s);
+    _drawLives(canvas, s);
+    _drawGems(canvas, s);
 
     // Punteggio (in alto a destra).
     _text(canvas, '${s.score}', Offset(w - 16, 16), 26,
@@ -24,68 +25,118 @@ class Hud extends Component with HasGameReference<BattleHymnGame> {
     _text(canvas, 'PUNTEGGIO', Offset(w - 16, 46), 11,
         align: TextAlign.right, color: Colors.white60);
 
-    // Combo (sotto il punteggio).
     if (s.combo > 1) {
       _text(canvas, '${s.combo}x COMBO', Offset(w - 16, 70), 16,
           align: TextAlign.right, color: Colors.amberAccent, bold: true);
     }
 
-    // Timer di sopravvivenza (centro in alto).
     _text(canvas, _formatTime(s.survivalTime), Offset(w / 2, 14), 20,
         align: TextAlign.center, color: Colors.white70, bold: true);
 
     _drawJudgment(canvas, s);
+    _drawBanner(canvas, s);
   }
 
   void _drawHpBar(Canvas canvas, GameState s) {
     const double x = 16, y = 16, width = 220, height = 18;
-    final RRect bg = RRect.fromRectAndRadius(
-      Rect.fromLTWH(x, y, width, height),
-      const Radius.circular(9),
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+          Rect.fromLTWH(x, y, width, height), const Radius.circular(9)),
+      Paint()..color = Colors.black.withValues(alpha: 0.4),
     );
-    canvas.drawRRect(bg, Paint()..color = Colors.black.withValues(alpha: 0.4));
-
     final double frac = (s.hp / GameConfig.maxHp).clamp(0.0, 1.0);
-    final Color hpColor = Color.lerp(Colors.redAccent, Colors.greenAccent, frac)!;
     if (frac > 0) {
       canvas.drawRRect(
         RRect.fromRectAndRadius(
-          Rect.fromLTWH(x, y, width * frac, height),
-          const Radius.circular(9),
-        ),
-        Paint()..color = hpColor,
+            Rect.fromLTWH(x, y, width * frac, height),
+            const Radius.circular(9)),
+        Paint()..color = Color.lerp(Colors.redAccent, Colors.greenAccent, frac)!,
       );
     }
     _text(canvas, 'HP ${s.hp.ceil()}', Offset(x + 8, y - 1), 13,
         color: Colors.white, bold: true);
   }
 
+  /// Vite extra: cuori rossi a destra della barra HP.
+  void _drawLives(Canvas canvas, GameState s) {
+    const double startX = 248, y = 25;
+    for (int i = 0; i < s.lives; i++) {
+      _heart(canvas, Offset(startX + i * 22, y), 8, Colors.redAccent);
+    }
+  }
+
+  /// Gemme verso la prossima vita: 5 rombi sotto la barra HP.
+  void _drawGems(Canvas canvas, GameState s) {
+    const double startX = 18, y = 46;
+    for (int i = 0; i < GameConfig.gemsPerLife; i++) {
+      final bool filled = i < s.gems;
+      _diamond(
+        canvas,
+        Offset(startX + i * 20, y),
+        7,
+        filled ? Colors.cyanAccent : Colors.white24,
+        filled,
+      );
+    }
+  }
+
   void _drawJudgment(Canvas canvas, GameState s) {
     if (s.lastJudgmentTimer <= 0 || s.lastJudgment == Judgment.none) return;
     final double a = (s.lastJudgmentTimer / 0.8).clamp(0.0, 1.0);
     final (String label, Color color) = switch (s.lastJudgment) {
-      Judgment.perfect => ('PERFECT', Colors.amberAccent),
-      Judgment.good => ('GOOD', Colors.lightGreenAccent),
+      Judgment.perfect => ('PERFECT  +GEMMA', Colors.amberAccent),
+      Judgment.good => ('GOOD  +GEMMA', Colors.lightGreenAccent),
+      Judgment.early => ('OK', Colors.white70),
       Judgment.miss => ('MISS', Colors.redAccent),
       Judgment.none => ('', Colors.white),
     };
-    final double yOffset = (1 - a) * 20;
-    _text(
-      canvas,
-      label,
-      Offset(game.size.x / 2, game.size.y * 0.42 - yOffset),
-      40,
-      align: TextAlign.center,
-      color: color.withValues(alpha: a),
-      bold: true,
+    _text(canvas, label, Offset(game.size.x / 2, game.size.y * 0.40 - (1 - a) * 20),
+        34, align: TextAlign.center, color: color.withValues(alpha: a), bold: true);
+  }
+
+  void _drawBanner(Canvas canvas, GameState s) {
+    if (s.bannerTimer <= 0 || s.banner == null) return;
+    final double a = (s.bannerTimer / 1.6).clamp(0.0, 1.0);
+    _text(canvas, s.banner!, Offset(game.size.x / 2, game.size.y * 0.30), 40,
+        align: TextAlign.center,
+        color: Colors.amberAccent.withValues(alpha: a),
+        bold: true);
+  }
+
+  // --- forme ----------------------------------------------------------------
+
+  void _diamond(
+      Canvas canvas, Offset c, double r, Color color, bool filled) {
+    final Path p = Path()
+      ..moveTo(c.dx, c.dy - r)
+      ..lineTo(c.dx + r * 0.8, c.dy)
+      ..lineTo(c.dx, c.dy + r)
+      ..lineTo(c.dx - r * 0.8, c.dy)
+      ..close();
+    canvas.drawPath(
+      p,
+      Paint()
+        ..color = color
+        ..style = filled ? PaintingStyle.fill : PaintingStyle.stroke
+        ..strokeWidth = 1.5,
     );
+  }
+
+  void _heart(Canvas canvas, Offset c, double r, Color color) {
+    final Path p = Path()
+      ..moveTo(c.dx, c.dy + r * 0.8)
+      ..cubicTo(c.dx - r * 1.6, c.dy - r * 0.5, c.dx - r * 0.4,
+          c.dy - r * 1.3, c.dx, c.dy - r * 0.4)
+      ..cubicTo(c.dx + r * 0.4, c.dy - r * 1.3, c.dx + r * 1.6,
+          c.dy - r * 0.5, c.dx, c.dy + r * 0.8)
+      ..close();
+    canvas.drawPath(p, Paint()..color = color);
   }
 
   String _formatTime(double t) {
     final int total = t.floor();
-    final int m = total ~/ 60;
-    final int sec = total % 60;
-    return '${m.toString().padLeft(2, '0')}:${sec.toString().padLeft(2, '0')}';
+    return '${(total ~/ 60).toString().padLeft(2, '0')}:'
+        '${(total % 60).toString().padLeft(2, '0')}';
   }
 
   void _text(
@@ -110,7 +161,6 @@ class Hud extends Component with HasGameReference<BattleHymnGame> {
       textAlign: align,
       textDirection: TextDirection.ltr,
     )..layout();
-
     double dx = pos.dx;
     if (align == TextAlign.right) dx -= tp.width;
     if (align == TextAlign.center) dx -= tp.width / 2;

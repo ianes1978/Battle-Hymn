@@ -1,132 +1,133 @@
 import 'package:flutter/material.dart';
 
-/// Configurazione centrale del gioco: costanti di bilanciamento, layout,
-/// scala musicale, finestre di tempismo e palette colori.
+import 'settings.dart';
+
+/// Configurazione centrale del gioco: scala musicale, tastiera, estensione
+/// dello spartito, finestre di tempismo, bilanciamento e colori.
 ///
-/// Tenere tutti i "numeri magici" qui rende facile il tuning del gameplay.
+/// Concetto chiave: l'INPUT conta per *classe di nota* (Do, Re, Mi, ...),
+/// indipendentemente dall'ottava. Sullo spartito, invece, le note occupano
+/// posizioni verticali diverse su 2 ottave (Do basso → La alto).
 class GameConfig {
   GameConfig._();
 
   // ---------------------------------------------------------------------------
-  // Scala musicale
+  // Classi di nota (0..11) — ciò che conta per l'input
   // ---------------------------------------------------------------------------
 
-  /// Nomi delle note di un'ottava cromatica completa (Do → Do²),
-  /// 13 semitoni: 8 tasti bianchi + 5 tasti neri (diesis).
-  static const List<String> scaleNames = [
-    'Do', // 0  (bianco)
-    'Do#', // 1  (nero)
-    'Re', // 2  (bianco)
-    'Re#', // 3  (nero)
-    'Mi', // 4  (bianco)
-    'Fa', // 5  (bianco)
-    'Fa#', // 6  (nero)
-    'Sol', // 7  (bianco)
-    'Sol#', // 8  (nero)
-    'La', // 9  (bianco)
-    'La#', // 10 (nero)
-    'Si', // 11 (bianco)
-    'Do²', // 12 (bianco)
+  static const List<String> solfegeNames = [
+    'Do', 'Do#', 'Re', 'Re#', 'Mi', 'Fa', 'Fa#', 'Sol', 'Sol#', 'La', 'La#', 'Si',
   ];
 
-  /// Numero di note/pitch disponibili.
-  static int get scaleLength => scaleNames.length;
+  static const List<String> letterNames = [
+    'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
+  ];
 
-  /// Semitoni che corrispondono ai tasti neri (diesis) all'interno di un'ottava.
-  static const Set<int> _blackSemitones = {1, 3, 6, 8, 10};
+  /// Numero di classi di nota disponibili (ottava cromatica).
+  static int get classCount => 12;
 
-  /// True se il pitch è un tasto nero (diesis).
-  static bool isBlackPitch(int pitch) => _blackSemitones.contains(pitch % 12);
+  /// Classi corrispondenti ai tasti neri (diesis).
+  static const Set<int> _blackClasses = {1, 3, 6, 8, 10};
 
-  /// Indici (in [scaleNames]) dei tasti bianchi, da sinistra a destra.
-  static const List<int> whitePitches = [0, 2, 4, 5, 7, 9, 11, 12];
+  static bool isBlackClass(int noteClass) =>
+      _blackClasses.contains(noteClass % 12);
 
-  /// Definizione dei tasti neri: per ognuno, l'indice del tasto bianco alla sua
-  /// sinistra (per posizionarlo sul confine) e il pitch corrispondente.
-  static const List<({int leftWhite, int pitch})> blackKeys = [
-    (leftWhite: 0, pitch: 1), // Do#
-    (leftWhite: 1, pitch: 3), // Re#
-    (leftWhite: 3, pitch: 6), // Fa#
-    (leftWhite: 4, pitch: 8), // Sol#
-    (leftWhite: 5, pitch: 10), // La#
+  /// Etichetta da disegnare per una classe, secondo la modalità scelta.
+  static String labelForClass(int noteClass, LabelMode mode) => switch (mode) {
+        LabelMode.solfege => solfegeNames[noteClass % 12],
+        LabelMode.letters => letterNames[noteClass % 12],
+        LabelMode.none => '',
+      };
+
+  // ---------------------------------------------------------------------------
+  // Tastiera: 13 tasti = un'ottava + Do (8 bianchi + 5 neri)
+  // Ogni "slot" ha una classe di nota; gli slot bianchi vanno da sinistra a
+  // destra, i neri stanno sul confine tra due bianchi.
+  // ---------------------------------------------------------------------------
+
+  /// Classi dei tasti bianchi: Do Re Mi Fa Sol La Si Do(²).
+  static const List<int> whiteSlotClasses = [0, 2, 4, 5, 7, 9, 11, 0];
+
+  /// Tasti neri: indice del bianco a sinistra + classe della nota.
+  static const List<({int leftWhite, int noteClass})> blackSlots = [
+    (leftWhite: 0, noteClass: 1), // Do#
+    (leftWhite: 1, noteClass: 3), // Re#
+    (leftWhite: 3, noteClass: 6), // Fa#
+    (leftWhite: 4, noteClass: 8), // Sol#
+    (leftWhite: 5, noteClass: 10), // La#
   ];
 
   // ---------------------------------------------------------------------------
-  // Tempismo (giudizi)
-  //
-  // Le finestre sono espresse in SECONDI rimanenti prima che la nota
-  // raggiunga la linea di esecuzione, così il feel è coerente anche quando la
-  // velocità delle note cambia con la difficoltà.
+  // Estensione sullo spartito: 2 ottave, dal Do basso al La alto.
+  // staffIndex assoluto = ottava * 12 + classe.  0 = Do basso ... 21 = La alto.
   // ---------------------------------------------------------------------------
 
-  /// Entro questa finestra il colpo è "Perfect".
-  static const double perfectWindow = 0.11;
-
-  /// Entro questa finestra (ma oltre perfectWindow) il colpo è "Good".
-  static const double goodWindow = 0.26;
+  static const int staffMin = 0;
+  static const int staffMax = 21;
+  static int get staffSpan => staffMax - staffMin + 1; // 22 posizioni
 
   // ---------------------------------------------------------------------------
-  // Punteggio
+  // Tempismo (per il bonus gemma). Il colpo riesce SEMPRE; il tempismo decide
+  // solo il giudizio e se assegnare la gemma.
+  // ---------------------------------------------------------------------------
+
+  static const double perfectWindow = 0.12;
+  static const double goodWindow = 0.28;
+
+  // ---------------------------------------------------------------------------
+  // Punteggio e gemme/vite
   // ---------------------------------------------------------------------------
 
   static const int scorePerfect = 100;
-  static const int scoreGood = 50;
+  static const int scoreGood = 60;
+  static const int scoreEarly = 20;
+
+  /// Gemme necessarie per guadagnare una vita.
+  static const int gemsPerLife = 5;
+
+  /// Tetto massimo di vite accumulabili.
+  static const int maxLives = 9;
 
   // ---------------------------------------------------------------------------
   // Vita del mago
   // ---------------------------------------------------------------------------
 
   static const double maxHp = 100;
-
-  /// Danno subìto quando una nota raggiunge la linea senza essere suonata.
   static const double missDamage = 12;
 
   // ---------------------------------------------------------------------------
-  // Layout (frazioni dell'altezza/larghezza dello schermo dove sensato)
+  // Layout
   // ---------------------------------------------------------------------------
 
-  /// Margine superiore del pentagramma.
-  static const double staffTop = 64;
+  /// Le 5 linee "principali" del pentagramma.
+  static const double staffTop = 70;
+  static const double staffHeight = 110;
 
-  /// Altezza della zona del pentagramma (le 5 linee).
-  static const double staffHeight = 120;
+  /// Banda verticale entro cui si distribuiscono le 2 ottave di note
+  /// (più ampia delle 5 linee, per ospitare i tagli addizionali).
+  static const double noteBandTop = 26;
+  static double get noteBandBottom => staffTop + staffHeight + 34;
 
-  /// Posizione X della linea di esecuzione (dove si "suona" la nota).
   static const double judgmentLineX = 150;
-
-  /// Altezza della tastiera on-screen in fondo allo schermo.
-  static const double keyboardHeight = 96;
-
-  /// Distanza verticale del mago dal bordo inferiore (sopra la tastiera).
-  static const double wizardBottomOffset = 150;
+  static const double keyboardHeight = 104;
+  static const double wizardBottomOffset = 158;
 
   // ---------------------------------------------------------------------------
   // Difficoltà / spawn
   // ---------------------------------------------------------------------------
 
-  /// Intervallo iniziale tra spawn (secondi).
   static const double initialSpawnInterval = 1.9;
-
-  /// Intervallo minimo raggiungibile a difficoltà alta.
-  static const double minSpawnInterval = 0.55;
-
-  /// Tempo iniziale impiegato da una nota per raggiungere la linea (secondi).
-  static const double initialNoteDuration = 3.6;
-
-  /// Tempo minimo (note più veloci = più difficili).
-  static const double minNoteDuration = 1.9;
-
-  /// Dopo quanti secondi di sopravvivenza si raggiunge la difficoltà massima.
+  static const double minSpawnInterval = 0.6;
+  static const double initialNoteDuration = 3.8;
+  static const double minNoteDuration = 2.1;
   static const double difficultyRampSeconds = 120;
 
   // ---------------------------------------------------------------------------
-  // Colore per pitch (identifica anche l'"elemento" della magia).
-  // Calcolato lungo la ruota dei colori così da avere una tinta distinta per
-  // ciascuno dei 13 semitoni.
+  // Colore per classe di nota (identifica anche l'"elemento").
   // ---------------------------------------------------------------------------
 
-  static Color colorForPitch(int pitch) {
-    final double hue = (pitch / scaleLength) * 360.0;
-    return HSVColor.fromAHSV(1, hue % 360, 0.6, 1.0).toColor();
+  static Color colorForClass(int noteClass) {
+    final double hue = (noteClass % 12) / 12 * 360.0;
+    return HSVColor.fromAHSV(1, hue % 360, 0.62, 1.0).toColor();
   }
 }

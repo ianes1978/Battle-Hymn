@@ -15,14 +15,19 @@ pianoforte** e il mago lancia una magia che lo distrugge.
 - Ogni **nota** sullo spartito ↔ un **nemico** sul campo (stesso `NoteData`).
 - La **posizione orizzontale** della nota = **distanza** del nemico dal mago.
   Nota lontana = nemico lontano; nota sulla linea = nemico che sta per colpire.
-- L'**altezza/pitch** della nota = **direzione** da cui arriva il nemico (settore
-  a 360°) e **colore/elemento** della magia.
-- Premi il tasto corretto **mentre la nota è vicino alla linea di esecuzione**:
-  - tempismo ottimo → **Perfect** (più punti);
-  - tempismo buono → **Good**;
-  - nota non suonata che raggiunge la linea → **Miss**, il mago perde HP.
-- A **0 HP** → game over. La difficoltà cresce nel tempo (nemici più frequenti
-  e più veloci).
+- L'**altezza/pitch** = **direzione** del nemico (360°) e **colore/elemento**.
+  Le note coprono **2 ottave** sullo spartito (Do basso → La alto, con tagli
+  addizionali), ma per colpire conta la **classe di nota, non l'ottava**: un
+  `La` va bene sia alto che basso.
+- **Si colpisce in ordine**: c'è sempre una sola **nota-bersaglio evidenziata**
+  (la più vicina alla linea). La colpisci premendo la nota giusta **in qualsiasi
+  momento** (il tempismo non è obbligatorio).
+  - a tempo (**Perfect/Good**) → **+1 gemma**;
+  - **5 gemme → +1 vita**;
+  - nota-bersaglio che raggiunge la linea non suonata → **Miss**, perdi HP.
+- A **0 HP**: se hai una vita, la consumi e continui; altrimenti **game over**.
+- **Opzioni nel menu**: etichette (Solfège / Lettere / Nessuna) e colori della
+  tastiera (ON/OFF). La difficoltà cresce nel tempo.
 
 ---
 
@@ -81,16 +86,16 @@ Per vedere i dispositivi disponibili: `flutter devices`.
 | Pausa                 | `P` o `ESC`                | Pulsante in pausa              |
 | Avvia / Riprova       | `Invio` o `Spazio`         | Pulsante a video               |
 
-La tastiera è un'**ottava cromatica** (13 semitoni) disposta come un pianoforte
-vero: 8 tasti bianchi + 5 tasti neri sovrapposti. Ogni nemico mostra **la
-lettera del tasto da premere**.
+La tastiera è un'ottava (8 tasti bianchi + 5 neri) disposta come un pianoforte
+vero. Conta la **classe di nota**, non l'ottava: `K` (Do²) e `A` (Do) suonano
+la stessa nota. Ogni nemico mostra l'etichetta scelta nel menu (Do Re Mi… /
+C D E… / nessuna).
 
 Mappatura (stile piano da computer):
 
 ```
-neri:    W   E       T   Y   U
-bianchi: A   S   D   F   G   H   J   K
-note:    Do Re Mi Fa Sol La Si Do²   (+ Do# Re# Fa# Sol# La#)
+neri:    W   E       T   Y   U          (Do# Re# Fa# Sol# La#)
+bianchi: A   S   D   F   G   H   J   K   (Do Re Mi Fa Sol La Si Do²)
 ```
 
 ---
