@@ -23,6 +23,12 @@ class AudioManager {
   final List<AudioPlayer> _drumPool = [];
   int _drumNext = 0;
 
+  // Basso (una nota grave per classe).
+  static const double _bassBaseFreq = 65.41; // Do2
+  final List<Uint8List> _bassWavs = [];
+  final List<AudioPlayer> _bassPool = [];
+  int _bassNext = 0;
+
   /// Prepara i WAV delle note e il pool di player.
   Future<void> init(int noteCount) async {
     for (int i = 0; i < noteCount; i++) {
@@ -43,6 +49,16 @@ class AudioManager {
       final AudioPlayer p = AudioPlayer();
       await p.setReleaseMode(ReleaseMode.stop);
       _drumPool.add(p);
+    }
+
+    // Basso (12 classi a ottava grave) + pool dedicato.
+    for (int i = 0; i < 12; i++) {
+      _bassWavs.add(_buildBassWav(_bassBaseFreq * pow(2, i / 12).toDouble()));
+    }
+    for (int i = 0; i < 3; i++) {
+      final AudioPlayer p = AudioPlayer();
+      await p.setReleaseMode(ReleaseMode.stop);
+      _bassPool.add(p);
     }
 
     _ready = true;
@@ -72,6 +88,17 @@ class AudioManager {
     _drumNext = (_drumNext + 1) % _drumPool.length;
     player
         .play(BytesSource(wav, mimeType: 'audio/wav'), volume: volume)
+        .catchError((_) {});
+  }
+
+  /// Suona la nota di basso (classe a ottava grave).
+  void playBass(int noteClass, double volume) {
+    if (!_ready || _bassWavs.isEmpty) return;
+    final int c = noteClass % _bassWavs.length;
+    final AudioPlayer player = _bassPool[_bassNext];
+    _bassNext = (_bassNext + 1) % _bassPool.length;
+    player
+        .play(BytesSource(_bassWavs[c], mimeType: 'audio/wav'), volume: volume)
         .catchError((_) {});
   }
 
@@ -112,6 +139,23 @@ class AudioManager {
       final double freq = 120 * exp(-t / 0.03) + 45;
       final double v = sin(2 * pi * freq * t) * env;
       s[i] = (v * 0.9 * 32767).clamp(-32768.0, 32767.0).toInt();
+    }
+    return _wrapWav(s);
+  }
+
+  /// Basso: sinusoide grave morbida (fondamentale + lieve 2ª armonica).
+  Uint8List _buildBassWav(double freq) {
+    const double dur = 0.4;
+    final int n = (_sampleRate * dur).round();
+    final Int16List s = Int16List(n);
+    const double attack = 0.01;
+    const double tau = 0.2;
+    for (int i = 0; i < n; i++) {
+      final double t = i / _sampleRate;
+      final double env = (t < attack ? t / attack : 1.0) * exp(-t / tau);
+      double v = sin(2 * pi * freq * t) + 0.3 * sin(2 * pi * freq * 2 * t);
+      v /= 1.3;
+      s[i] = (v * env * 0.8 * 32767).clamp(-32768.0, 32767.0).toInt();
     }
     return _wrapWav(s);
   }

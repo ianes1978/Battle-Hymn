@@ -41,15 +41,25 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
     }
   }
 
+  /// Progressione di accordi in Do maggiore: C - G - Am - F (radici come classi).
+  static const List<int> _chordRoots = [0, 7, 9, 5];
+
   void _onBeat(int beatIndex, double beatInterval) {
     // Pulsazione visiva + base ritmica.
     game.beatPulse = 1;
-    final bool accent = beatIndex % 4 == 0;
+    final int beatInBar = beatIndex % 4;
+    final bool accent = beatInBar == 0;
     game.audio.playKick(accent ? 0.6 : 0.4);
     // Crescendo: con la combo si aggiunge l'hi-hat.
     if (game.state.combo >= 8) {
       game.audio.playHat(game.state.combo >= 20 ? 0.32 : 0.2);
     }
+
+    // Basso: radice dell'accordo del battito (la quinta sull'ultimo beat,
+    // per dare movimento). Una battuta = 4 beat, un accordo per battuta.
+    final int root = _chordRoots[(beatIndex ~/ 4) % _chordRoots.length];
+    final int bassClass = beatInBar == 3 ? (root + 7) % 12 : root;
+    game.audio.playBass(bassClass, accent ? 0.34 : 0.28);
 
     // Densità: più note man mano che si sopravvive / con la difficoltà.
     final double d = game.state.difficulty;

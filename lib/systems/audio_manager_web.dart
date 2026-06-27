@@ -50,6 +50,28 @@ class AudioManager {
     osc.stop(t + 0.5);
   }
 
+  void playBass(int noteClass, double volume) {
+    final web.AudioContext? ctx = _ctx;
+    if (ctx == null) return;
+    _resume(ctx);
+    final double freq = 65.41 * pow(2, (noteClass % 12) / 12).toDouble(); // Do2
+    final double t = ctx.currentTime + 0.018;
+
+    final web.OscillatorNode osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+
+    final web.GainNode g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(volume, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
+
+    osc.connect(g);
+    g.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.4);
+  }
+
   void playKick(double volume) {
     final web.AudioContext? ctx = _ctx;
     if (ctx == null) return;
