@@ -1,0 +1,78 @@
+# Builda la versione web di Battle Hymn e la pubblica su GitHub Pages.
+#
+# La pubblicazione avviene dal branch di default del repository.
+# La prima esecuzione abilita automaticamente GitHub Pages (enablement: true),
+# quindi non è necessario configurarlo a mano nelle impostazioni del repo.
+name: Deploy web su GitHub Pages
+
+on:
+  push:
+    branches:
+      - claude/battle-hymn-flutter-game-sopz9h
+  # Permette anche l'avvio manuale dalla tab "Actions".
+  workflow_dispatch:
+
+# Permessi necessari per il deploy su Pages tramite Actions.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Evita deploy concorrenti; non annulla un deploy già in corso.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build web
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Genera le cartelle di piattaforma (web)
+        run: flutter create --platforms=web .
+
+      - name: Installa le dipendenze
+        run: flutter pub get
+
+      - name: Analisi statica
+        run: flutter analyze
+        # Non blocca il deploy in caso di warning di lint.
+        continue-on-error: true
+
+      - name: Test unitari
+        run: flutter test
+
+      # base-href deve combaciare col nome del repo (project site:
+      # https://ianes1978.github.io/Battle-Hymn/).
+      - name: Build web (release)
+        run: flutter build web --release --base-href "/Battle-Hymn/"
+
+      - name: Configura Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Carica l'artifact del sito
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    name: Deploy su Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
