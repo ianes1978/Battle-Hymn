@@ -70,6 +70,19 @@ class Enemy extends PositionComponent with HasGameReference<BattleHymnGame> {
 
   @override
   void render(Canvas canvas) {
+    // Anello di esplosione quando il nemico viene distrutto.
+    if (_dying && note.state == BeatState.resolved) {
+      final double prog = ((0.25 - _deathTimer) / 0.25).clamp(0.0, 1.0);
+      canvas.drawCircle(
+        Offset.zero,
+        16 + prog * 28,
+        Paint()
+          ..color = note.color.withValues(alpha: (1 - prog) * 0.8)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 3.5 * (1 - prog) + 0.5,
+      );
+    }
+
     final bool isTarget = game.activeTarget == note;
 
     // Anello di evidenziazione del bersaglio corrente (non ruota/scala).

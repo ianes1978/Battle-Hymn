@@ -15,6 +15,14 @@ class Hud extends Component with HasGameReference<BattleHymnGame> {
     final GameState s = game.state;
     final double w = game.size.x;
 
+    // Lampo a tutto schermo (oro su Perfect/vita, rosso su Miss).
+    if (s.flashAlpha > 0) {
+      canvas.drawRect(
+        Rect.fromLTWH(-40, -40, w + 80, game.size.y + 80),
+        Paint()..color = s.flashColor.withValues(alpha: 0.22 * s.flashAlpha),
+      );
+    }
+
     _drawHpBar(canvas, s);
     _drawLives(canvas, s);
     _drawGems(canvas, s);

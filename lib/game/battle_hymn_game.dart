@@ -70,6 +70,20 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   }
 
   @override
+  void render(Canvas canvas) {
+    // Scossa schermo: trasla tutto il rendering di un piccolo offset.
+    final Offset o = state.shakeOffset();
+    if (o == Offset.zero) {
+      super.render(canvas);
+      return;
+    }
+    canvas.save();
+    canvas.translate(o.dx, o.dy);
+    super.render(canvas);
+    canvas.restore();
+  }
+
+  @override
   void update(double dt) {
     super.update(dt);
     state.update(dt);

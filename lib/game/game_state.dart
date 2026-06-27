@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+
 import 'config.dart';
 import 'note_data.dart';
 
@@ -28,6 +32,41 @@ class GameState {
   /// Flag per il feedback "vita guadagnata" / "vita persa".
   String? banner;
   double bannerTimer = 0;
+
+  // --- Feedback "juice": scossa schermo e lampo a tutto schermo ---
+  final Random _rng = Random();
+  static const double _shakeDur = 0.28;
+  double _shakeMag = 0;
+  double _shakeTime = 0;
+  double _flashTime = 0;
+  double _flashDur = 0;
+  Color flashColor = const Color(0x00000000);
+
+  void _addShake(double mag) {
+    if (mag > _shakeMag) _shakeMag = mag;
+    _shakeTime = _shakeDur;
+  }
+
+  void _addFlash(Color color, double dur) {
+    flashColor = color;
+    _flashTime = dur;
+    _flashDur = dur;
+  }
+
+  /// Offset di scossa da applicare al rendering (decade nel tempo).
+  Offset shakeOffset() {
+    if (_shakeTime <= 0) return Offset.zero;
+    final double k = _shakeTime / _shakeDur;
+    final double m = _shakeMag * k;
+    return Offset(
+      (_rng.nextDouble() * 2 - 1) * m,
+      (_rng.nextDouble() * 2 - 1) * m,
+    );
+  }
+
+  /// Opacità corrente del lampo a schermo (0..1).
+  double get flashAlpha =>
+      _flashDur <= 0 ? 0 : (_flashTime / _flashDur).clamp(0.0, 1.0);
 
   void reset() {
     hp = GameConfig.maxHp;
@@ -66,8 +105,18 @@ class GameState {
         if (lives < GameConfig.maxLives) {
           lives += 1;
           _showBanner('+1 VITA!');
+          _addFlash(const Color(0xFFFFD54F), 0.5);
+          _addShake(6);
         }
       }
+    }
+
+    // Feedback in base al giudizio.
+    if (judgment == Judgment.perfect) {
+      _addFlash(const Color(0xFFFFD54F), 0.18);
+      _addShake(3.5);
+    } else if (judgment == Judgment.good) {
+      _addShake(2);
     }
     _flashJudgment(judgment);
   }
@@ -77,6 +126,8 @@ class GameState {
   void registerMiss() {
     hp = (hp - GameConfig.missDamage).clamp(0, GameConfig.maxHp);
     combo = 0;
+    _addFlash(const Color(0xFFFF5252), 0.28);
+    _addShake(9);
     _flashJudgment(Judgment.miss);
     if (hp <= 0) {
       if (lives > 0) {
@@ -109,6 +160,11 @@ class GameState {
       bannerTimer = (bannerTimer - dt).clamp(0, double.infinity);
       if (bannerTimer == 0) banner = null;
     }
+    if (_shakeTime > 0) {
+      _shakeTime -= dt;
+      if (_shakeTime <= 0) _shakeMag = 0;
+    }
+    if (_flashTime > 0) _flashTime -= dt;
   }
 
   double get difficulty =>
