@@ -210,22 +210,31 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
       return; // nota sbagliata o nessun bersaglio: nessun effetto
     }
 
-    _resolveHit(target);
+    _hitTarget(target);
   }
 
-  /// Risolve un colpo riuscito: distrugge il nemico e lancia la magia.
-  void _resolveHit(NoteData note) {
+  /// Colpo a segno sul bersaglio. I nemici resistenti (corazzato/boss)
+  /// richiedono più colpi: solo l'ultimo li distrugge.
+  void _hitTarget(NoteData note) {
     final Judgment judgment = note.evaluate();
     final bool gem =
         judgment == Judgment.perfect || judgment == Judgment.good;
 
-    note.state = BeatState.resolved;
     note.judgment = judgment;
-    activeTarget = null;
+    note.hitsTaken += 1;
     state.registerHit(judgment, gem);
     wizard.cast(note.angle);
+    _spawnSpellTo(note);
 
-    // Posizione del nemico colpito, per indirizzare la magia.
+    if (note.hitsTaken >= note.hits) {
+      note.state = BeatState.resolved; // distrutto
+      activeTarget = null;
+    }
+    // Altrimenti il nemico sopravvive e resta il bersaglio (armatura).
+  }
+
+  /// Lancia una magia (cosmetica) dal mago verso il nemico della nota.
+  void _spawnSpellTo(NoteData note) {
     Vector2? targetPos;
     for (final Enemy e in children.whereType<Enemy>()) {
       if (e.note == note) {

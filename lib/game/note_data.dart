@@ -9,6 +9,9 @@ enum Judgment { perfect, good, early, miss, none }
 /// Stato del "beat" (coppia nota + nemico, che condividono questo dato).
 enum BeatState { active, resolved, missed }
 
+/// Tipo di nemico (varietà di gameplay).
+enum EnemyType { normal, fast, armored, boss }
+
 /// Modello dati condiviso tra una nota sullo spartito e il nemico associato.
 ///
 /// - [noteClass] (0..11) è ciò che conta per l'input: premere la nota giusta,
@@ -28,16 +31,30 @@ class NoteData {
   /// Secondi per raggiungere la linea di esecuzione / il mago.
   final double duration;
 
+  /// Tipo di nemico.
+  final EnemyType type;
+
+  /// Colpi corretti necessari per distruggerlo (1 = normale).
+  final int hits;
+
   double elapsed = 0;
   BeatState state = BeatState.active;
   Judgment judgment = Judgment.none;
+
+  /// Colpi corretti già messi a segno.
+  int hitsTaken = 0;
 
   NoteData({
     required this.noteClass,
     required this.staffIndex,
     required this.angle,
     required this.duration,
+    this.type = EnemyType.normal,
+    this.hits = 1,
   });
+
+  /// Colpi residui prima della distruzione.
+  int get hitsLeft => hits - hitsTaken;
 
   double get progress => (elapsed / duration).clamp(0.0, 1.0);
   double get timeRemaining => (duration - elapsed).clamp(0.0, duration);

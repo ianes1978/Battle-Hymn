@@ -17,11 +17,13 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
   double _songTime = 0;
   int _lastBeat = -1;
   double _beatsSinceSpawn = 99; // grande: spawn quasi subito
+  double _lastBossTime = -999;
 
   void reset() {
     _songTime = 0;
     _lastBeat = -1;
     _beatsSinceSpawn = 99;
+    _lastBossTime = -999;
     _melody.reset();
   }
 
@@ -85,9 +87,11 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
     final double jitter = (_rng.nextDouble() - 0.5) * 0.3;
     final double angle = (sector + jitter).clamp(pi + 0.08, 2 * pi - 0.08);
 
-    // Durata = numero intero di beat: così l'arrivo cade su un battito.
-    final int travelBeats =
-        (_lerp(6, 4, d) * Tuning.durationScale).clamp(2.0, 9.0).round();
+    // --- Scelta del tipo di nemico ---
+    final (EnemyType type, int hits, int travelDelta) = _pickType(d);
+
+    final double baseTravel = _lerp(6, 4, d) * Tuning.durationScale;
+    final int travelBeats = (baseTravel + travelDelta).clamp(2.0, 12.0).round();
     final double duration = travelBeats * beatInterval;
 
     game.spawnBeat(NoteData(
@@ -95,7 +99,31 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
       staffIndex: staffIndex,
       angle: angle,
       duration: duration,
+      type: type,
+      hits: hits,
     ));
+  }
+
+  /// Decide tipo, colpi richiesti e variazione di velocità (in beat).
+  (EnemyType, int, int) _pickType(double d) {
+    // Mini-boss periodico (se non ce n'è già uno e c'è un minimo di difficoltà).
+    final bool bossActive =
+        game.notes.any((n) => n.isActive && n.type == EnemyType.boss);
+    if (!bossActive && d > 0.15 && _songTime - _lastBossTime > 28) {
+      _lastBossTime = _songTime;
+      return (EnemyType.boss, 4, 3); // lento e resistente
+    }
+
+    final double r = _rng.nextDouble();
+    final double pFast = 0.30 * d;
+    final double pArmored = 0.25 * d;
+    if (r < pFast) {
+      return (EnemyType.fast, 1, -2); // veloce
+    }
+    if (r < pFast + pArmored && _songTime > 20) {
+      return (EnemyType.armored, 2, 1); // corazzato (2 colpi)
+    }
+    return (EnemyType.normal, 1, 0);
   }
 
   int _activeCount() {
