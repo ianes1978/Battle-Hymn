@@ -99,14 +99,10 @@ class GameConfig {
   // Layout
   // ---------------------------------------------------------------------------
 
-  /// Le 5 linee "principali" del pentagramma.
-  static const double staffTop = 70;
-  static const double staffHeight = 110;
-
-  /// Banda verticale entro cui si distribuiscono le 2 ottave di note
-  /// (più ampia delle 5 linee, per ospitare i tagli addizionali).
-  static const double noteBandTop = 26;
-  static double get noteBandBottom => staffTop + staffHeight + 34;
+  /// Le 5 linee "principali" del pentagramma (un po' più in basso per fare
+  /// spazio alla HUD e alle note acute fuori dal rigo).
+  static const double staffTop = 96;
+  static const double staffHeight = 108;
 
   static const double judgmentLineX = 150;
   static const double keyboardHeight = 104;

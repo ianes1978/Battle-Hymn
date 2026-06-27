@@ -53,10 +53,14 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
       staffIndex = noteClass;
     }
 
-    // Direzione a 360° derivata dalla classe (settori distinti) + jitter.
-    final double sector = (noteClass / GameConfig.classCount) * 2 * pi;
-    final double jitter = (_rng.nextDouble() - 0.5) * 0.5;
-    final double angle = sector - pi / 2 + jitter;
+    // Direzione derivata dalla classe, ma limitata al SEMICERCHIO SUPERIORE
+    // (dall'alto e dai lati, mai da sotto: il mago è in basso al centro).
+    // In coordinate schermo l'asse Y cresce verso il basso, quindi gli angoli
+    // in [π, 2π] puntano verso l'alto/i lati.
+    final double sector =
+        pi + ((noteClass + 0.5) / GameConfig.classCount) * pi;
+    final double jitter = (_rng.nextDouble() - 0.5) * 0.35;
+    final double angle = (sector + jitter).clamp(pi + 0.08, 2 * pi - 0.08);
 
     final double d = game.state.difficulty;
     final double duration = _lerp(

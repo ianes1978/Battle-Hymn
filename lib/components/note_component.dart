@@ -105,17 +105,15 @@ class NoteComponent extends PositionComponent
     }
   }
 
-  /// Disegna brevi tagli addizionali se la nota esce dalle linee principali.
+  /// Disegna un taglio addizionale solo se la nota cade su una linea fuori dal
+  /// pentagramma (le note negli spazi non hanno linea).
   void _drawLedger(Canvas canvas, double alpha) {
-    final double y = position.y;
-    final bool above = y < GameConfig.staffTop;
-    final bool below = y > GameConfig.staffTop + GameConfig.staffHeight;
-    if (above || below) {
+    if (Staff.needsLedger(note.staffIndex)) {
       canvas.drawLine(
         const Offset(-12, 0),
         const Offset(12, 0),
         Paint()
-          ..color = Colors.white.withValues(alpha: 0.35 * alpha)
+          ..color = Colors.white.withValues(alpha: 0.45 * alpha)
           ..strokeWidth = 1.5,
       );
     }
