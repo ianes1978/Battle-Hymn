@@ -74,13 +74,24 @@ Per vedere i dispositivi disponibili: `flutter devices`.
 
 ## Controlli
 
-| Azione            | Tastiera fisica            | Mouse / Touch                |
-|-------------------|----------------------------|------------------------------|
-| Suona Do…Do²      | `A S D F G H J K`          | Clicca/tappa i tasti a video |
-| Pausa             | `P` o `ESC`                | Pulsante in pausa            |
-| Avvia / Riprova   | `Invio` o `Spazio`         | Pulsante a video             |
+| Azione                | Tastiera fisica            | Mouse / Touch                  |
+|-----------------------|----------------------------|--------------------------------|
+| Tasti bianchi (naturali) | `A S D F G H J K`       | Clicca/tappa i tasti bianchi   |
+| Tasti neri (diesis)   | `W E  T Y U`               | Clicca/tappa i tasti neri      |
+| Pausa                 | `P` o `ESC`                | Pulsante in pausa              |
+| Avvia / Riprova       | `Invio` o `Spazio`         | Pulsante a video               |
 
-Mappatura note: `A=Do  S=Re  D=Mi  F=Fa  G=Sol  H=La  J=Si  K=Do²`.
+La tastiera è un'**ottava cromatica** (13 semitoni) disposta come un pianoforte
+vero: 8 tasti bianchi + 5 tasti neri sovrapposti. Ogni nemico mostra **la
+lettera del tasto da premere**.
+
+Mappatura (stile piano da computer):
+
+```
+neri:    W   E       T   Y   U
+bianchi: A   S   D   F   G   H   J   K
+note:    Do Re Mi Fa Sol La Si Do²   (+ Do# Re# Fa# Sol# La#)
+```
 
 ---
 

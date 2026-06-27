@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../game/battle_hymn_game.dart';
-import '../input/key_mapping.dart';
 
 /// Schermata iniziale: titolo, controlli e pulsante per iniziare.
 class MenuOverlay extends StatelessWidget {
@@ -28,9 +27,10 @@ class MenuOverlay extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         Text(
-          'Suona la nota giusta quando il nemico raggiunge la linea.\n'
-          'Tasti: ${KeyMapping.keyLabels.join('  ')}  (oppure clicca i tasti).\n'
-          'P / ESC per pausa.',
+          'Premi il tasto mostrato sul nemico quando raggiunge la linea.\n'
+          'Tasti bianchi:  A S D F G H J K\n'
+          'Tasti neri (diesis):  W E  T Y U\n'
+          'Puoi anche cliccare/toccare il pianoforte.  P / ESC = pausa.',
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 15, color: Colors.white.withValues(alpha: 0.85)),
         ),

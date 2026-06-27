@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../game/battle_hymn_game.dart';
 import '../game/note_data.dart';
+import '../input/key_mapping.dart';
 
 /// Nemico che avanza radialmente verso il mago. La sua posizione è derivata
 /// dal [NoteData] condiviso con la nota sullo spartito (sincronizzati).
@@ -101,9 +102,28 @@ class Enemy extends PositionComponent with HasGameReference<BattleHymnGame> {
         ..strokeWidth = 2,
     );
 
-    // Nucleo.
-    canvas.drawCircle(Offset.zero, 4, Paint()..color = Colors.white);
-
     canvas.restore();
+
+    // Lettera del tasto da premere (sempre dritta e leggibile, fuori da
+    // rotazione/scala): è il riferimento principale per il giocatore.
+    if (!_dying) {
+      _drawLabel(canvas, KeyMapping.keyLabels[note.pitch]);
+    }
+  }
+
+  void _drawLabel(Canvas canvas, String s) {
+    final TextPainter tp = TextPainter(
+      text: TextSpan(
+        text: s,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          shadows: [Shadow(blurRadius: 3, color: Colors.black)],
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    tp.paint(canvas, Offset(-tp.width / 2, -tp.height / 2));
   }
 }

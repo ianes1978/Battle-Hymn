@@ -11,20 +11,45 @@ class GameConfig {
   // Scala musicale
   // ---------------------------------------------------------------------------
 
-  /// Nomi dei gradi della scala mostrati sui tasti (un'ottava diatonica).
+  /// Nomi delle note di un'ottava cromatica completa (Do → Do²),
+  /// 13 semitoni: 8 tasti bianchi + 5 tasti neri (diesis).
   static const List<String> scaleNames = [
-    'Do',
-    'Re',
-    'Mi',
-    'Fa',
-    'Sol',
-    'La',
-    'Si',
-    'Do²',
+    'Do', // 0  (bianco)
+    'Do#', // 1  (nero)
+    'Re', // 2  (bianco)
+    'Re#', // 3  (nero)
+    'Mi', // 4  (bianco)
+    'Fa', // 5  (bianco)
+    'Fa#', // 6  (nero)
+    'Sol', // 7  (bianco)
+    'Sol#', // 8  (nero)
+    'La', // 9  (bianco)
+    'La#', // 10 (nero)
+    'Si', // 11 (bianco)
+    'Do²', // 12 (bianco)
   ];
 
   /// Numero di note/pitch disponibili.
   static int get scaleLength => scaleNames.length;
+
+  /// Semitoni che corrispondono ai tasti neri (diesis) all'interno di un'ottava.
+  static const Set<int> _blackSemitones = {1, 3, 6, 8, 10};
+
+  /// True se il pitch è un tasto nero (diesis).
+  static bool isBlackPitch(int pitch) => _blackSemitones.contains(pitch % 12);
+
+  /// Indici (in [scaleNames]) dei tasti bianchi, da sinistra a destra.
+  static const List<int> whitePitches = [0, 2, 4, 5, 7, 9, 11, 12];
+
+  /// Definizione dei tasti neri: per ognuno, l'indice del tasto bianco alla sua
+  /// sinistra (per posizionarlo sul confine) e il pitch corrispondente.
+  static const List<({int leftWhite, int pitch})> blackKeys = [
+    (leftWhite: 0, pitch: 1), // Do#
+    (leftWhite: 1, pitch: 3), // Re#
+    (leftWhite: 3, pitch: 6), // Fa#
+    (leftWhite: 4, pitch: 8), // Sol#
+    (leftWhite: 5, pitch: 10), // La#
+  ];
 
   // ---------------------------------------------------------------------------
   // Tempismo (giudizi)
@@ -95,21 +120,13 @@ class GameConfig {
   static const double difficultyRampSeconds = 120;
 
   // ---------------------------------------------------------------------------
-  // Palette colori per pitch (uno per grado della scala)
-  // Il colore identifica anche l'"elemento" della magia.
+  // Colore per pitch (identifica anche l'"elemento" della magia).
+  // Calcolato lungo la ruota dei colori così da avere una tinta distinta per
+  // ciascuno dei 13 semitoni.
   // ---------------------------------------------------------------------------
 
-  static const List<Color> pitchColors = [
-    Color(0xFFFF5252), // Do  - rosso
-    Color(0xFFFF9800), // Re  - arancio
-    Color(0xFFFFEB3B), // Mi  - giallo
-    Color(0xFF66BB6A), // Fa  - verde
-    Color(0xFF26C6DA), // Sol - ciano
-    Color(0xFF42A5F5), // La  - blu
-    Color(0xFFAB47BC), // Si  - viola
-    Color(0xFFEC407A), // Do² - rosa
-  ];
-
-  static Color colorForPitch(int pitch) =>
-      pitchColors[pitch % pitchColors.length];
+  static Color colorForPitch(int pitch) {
+    final double hue = (pitch / scaleLength) * 360.0;
+    return HSVColor.fromAHSV(1, hue % 360, 0.6, 1.0).toColor();
+  }
 }
