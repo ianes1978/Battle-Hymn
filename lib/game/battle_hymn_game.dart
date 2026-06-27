@@ -113,6 +113,18 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
     audio.startBgm();
   }
 
+  /// Torna al menu principale (dalla pausa o dal game over).
+  void goToMenu() {
+    _clearBeats();
+    state.reset();
+    spawner.reset();
+    audio.stopBgm();
+    overlays.remove(Overlays.gameOver);
+    overlays.remove(Overlays.pause);
+    overlays.add(Overlays.menu);
+    pauseEngine();
+  }
+
   /// Mette in pausa / riprende (ignorato durante menu o game over).
   void togglePause() {
     if (overlays.isActive(Overlays.menu) ||

@@ -46,6 +46,14 @@ class GameOverOverlay extends StatelessWidget {
             ),
             child: const Text('RIPROVA'),
           ),
+          const SizedBox(height: 12),
+          TextButton(
+            onPressed: game.goToMenu,
+            child: const Text(
+              'Menu principale',
+              style: TextStyle(color: Colors.white70, fontSize: 15),
+            ),
+          ),
         ],
       ),
     );

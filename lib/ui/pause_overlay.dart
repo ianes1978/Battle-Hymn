@@ -44,6 +44,13 @@ class PauseOverlay extends StatelessWidget {
               style: TextStyle(color: Colors.white70, fontSize: 15),
             ),
           ),
+          TextButton(
+            onPressed: game.goToMenu,
+            child: const Text(
+              'Menu principale',
+              style: TextStyle(color: Colors.white70, fontSize: 15),
+            ),
+          ),
         ],
       ),
     );
