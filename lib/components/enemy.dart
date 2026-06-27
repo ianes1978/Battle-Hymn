@@ -57,7 +57,7 @@ class Enemy extends PositionComponent with HasGameReference<BattleHymnGame> {
     }
 
     // Posizione radiale: progress 0 = lontano, progress 1 = sul mago.
-    final Vector2 origin = game.wizard.center;
+    final Vector2 origin = game.wizard.homePosition;
     final double distance = _maxRadius * (1 - note.progress);
     position = origin + Vector2(cos(note.angle), sin(note.angle)) * distance;
   }

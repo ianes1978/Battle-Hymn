@@ -17,8 +17,10 @@ class Wizard extends PositionComponent with HasGameReference<BattleHymnGame> {
   /// Angolo verso cui il mago sta "guardando" durante l'ultimo lancio.
   double _aim = -pi / 2;
 
-  /// Posizione del mago calcolata dalla dimensione corrente dello schermo.
-  Vector2 get center => Vector2(
+  /// Posizione di "casa" del mago, calcolata dalla dimensione dello schermo.
+  /// (Non si chiama `center` per non sovrascrivere la proprietà di
+  /// PositionComponent.)
+  Vector2 get homePosition => Vector2(
         game.size.x / 2,
         game.size.y - GameConfig.wizardBottomOffset,
       );
@@ -32,15 +34,15 @@ class Wizard extends PositionComponent with HasGameReference<BattleHymnGame> {
   @override
   void update(double dt) {
     super.update(dt);
-    position = center;
+    position = homePosition;
     if (_castFlash > 0) _castFlash -= dt;
   }
 
   @override
   void render(Canvas canvas) {
     const double r = 26; // raggio corpo
-    final Color robe = const Color(0xFF5C6BC0);
-    final Color hat = const Color(0xFF3949AB);
+    const Color robe = Color(0xFF5C6BC0);
+    const Color hat = Color(0xFF3949AB);
 
     // Aura di lancio.
     if (_castFlash > 0) {
@@ -86,7 +88,7 @@ class Wizard extends PositionComponent with HasGameReference<BattleHymnGame> {
 
     // Stella sul cappello.
     canvas.drawCircle(
-      Offset(0, -r - 6),
+      const Offset(0, -r - 6),
       2.5,
       Paint()..color = Colors.amberAccent,
     );

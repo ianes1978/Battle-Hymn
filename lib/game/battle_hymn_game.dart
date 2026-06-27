@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/services.dart';
@@ -180,11 +179,11 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
         break;
       }
     }
-    targetPos ??= wizard.center +
+    targetPos ??= wizard.homePosition +
         Vector2(cos(note.angle), sin(note.angle)) * 200;
 
     add(Spell(
-      start: wizard.center.clone(),
+      start: wizard.homePosition.clone(),
       target: targetPos,
       color: note.color,
     ));

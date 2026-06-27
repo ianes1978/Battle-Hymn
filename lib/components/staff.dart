@@ -13,16 +13,16 @@ class Staff extends Component with HasGameReference<BattleHymnGame> {
   /// Pitch alto = più in alto sullo spartito.
   static double yForPitch(int pitch) {
     final double t = pitch / (GameConfig.scaleLength - 1); // 0..1
-    final double top = GameConfig.staffTop;
-    final double bottom = GameConfig.staffTop + GameConfig.staffHeight;
+    const double top = GameConfig.staffTop;
+    const double bottom = GameConfig.staffTop + GameConfig.staffHeight;
     return bottom - t * (bottom - top);
   }
 
   @override
   void render(Canvas canvas) {
     final double width = game.size.x;
-    final double top = GameConfig.staffTop;
-    final double height = GameConfig.staffHeight;
+    const double top = GameConfig.staffTop;
+    const double height = GameConfig.staffHeight;
 
     // Pannello semitrasparente dietro il pentagramma.
     final Paint panel = Paint()..color = Colors.black.withValues(alpha: 0.18);
@@ -38,7 +38,7 @@ class Staff extends Component with HasGameReference<BattleHymnGame> {
     }
 
     // Linea di esecuzione (glow).
-    final double x = GameConfig.judgmentLineX;
+    const double x = GameConfig.judgmentLineX;
     final Paint glow = Paint()
       ..color = Colors.amberAccent.withValues(alpha: 0.85)
       ..strokeWidth = 4
