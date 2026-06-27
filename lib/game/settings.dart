@@ -22,9 +22,12 @@ class GameSettings {
   /// (note e nemici restano comunque colorati).
   bool keyboardColors = true;
 
-  /// Moltiplicatore di velocità/tempo scelto prima della partita.
-  /// < 1 rallenta (più facile), > 1 accelera. 1.0 = normale.
-  double speed = 1.0;
+  /// Tempo del gioco in BPM (beat al minuto): regola arrivo note e spawn.
+  /// 120 BPM = velocità "normale".
+  double bpm = 120;
+
+  /// Moltiplicatore di velocità derivato dal BPM (120 BPM = 1.0x).
+  double get speed => bpm / 120.0;
 
   /// Preset di difficoltà (regola danno, ritmo, finestre, vite iniziali...).
   Difficulty difficulty = Difficulty.normale;

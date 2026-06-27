@@ -73,17 +73,19 @@ class _MenuOverlayState extends State<MenuOverlay> {
             ),
             const SizedBox(height: 14),
 
-            // --- Opzione: velocità / tempo ---
-            _label('Velocità'),
-            _segment<double>(
-              current: settings.speed,
-              // niente 'const': le chiavi double non hanno primitive equality.
-              options: {
-                0.6: 'Lento',
-                1.0: 'Normale',
-                1.4: 'Veloce',
-              },
-              onSelect: (v) => setState(() => settings.speed = v),
+            // --- Opzione: tempo (slider BPM) ---
+            _label('Tempo: ${settings.bpm.round()} BPM'),
+            SizedBox(
+              width: 280,
+              child: Slider(
+                value: settings.bpm,
+                min: 60,
+                max: 200,
+                divisions: 28, // passo di 5 BPM
+                label: '${settings.bpm.round()} BPM',
+                activeColor: Colors.amberAccent,
+                onChanged: (v) => setState(() => settings.bpm = v),
+              ),
             ),
             const SizedBox(height: 14),
 
