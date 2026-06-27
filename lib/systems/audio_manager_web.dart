@@ -32,57 +32,50 @@ class AudioManager {
     _resume(ctx);
 
     final double freq = _baseFreq * pow(2, (noteClass % 12) / 12).toDouble();
-    final double now = ctx.currentTime;
+    final double t = ctx.currentTime + 0.018; // piccolo lookahead
 
-    // Inviluppo principale (attacco rapido + decadimento).
-    final web.GainNode master = ctx.createGain();
-    master.gain.setValueAtTime(0.0001, now);
-    master.gain.exponentialRampToValueAtTime(0.5, now + 0.006);
-    master.gain.exponentialRampToValueAtTime(0.0008, now + 0.45);
-    master.connect(ctx.destination);
+    // Un solo oscillatore (triangolare = timbro ricco con un nodo solo).
+    final web.OscillatorNode osc = ctx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
 
-    // Fondamentale + 2 armoniche.
-    const List<double> harmonics = [1.0, 2.0, 3.0];
-    const List<double> levels = [1.0, 0.4, 0.2];
-    for (int i = 0; i < harmonics.length; i++) {
-      final web.OscillatorNode osc = ctx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = freq * harmonics[i];
-      final web.GainNode g = ctx.createGain();
-      g.gain.value = levels[i];
-      osc.connect(g);
-      g.connect(master);
-      osc.start(now);
-      osc.stop(now + 0.5);
-    }
+    final web.GainNode g = ctx.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.45, t + 0.006); // attacco lineare
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.45); // decadimento
+
+    osc.connect(g);
+    g.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.5);
   }
 
   void playKick(double volume) {
     final web.AudioContext? ctx = _ctx;
     if (ctx == null) return;
     _resume(ctx);
-    final double now = ctx.currentTime;
+    final double t = ctx.currentTime + 0.018;
 
     final web.OscillatorNode osc = ctx.createOscillator();
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(165, now);
-    osc.frequency.exponentialRampToValueAtTime(45, now + 0.12);
+    osc.frequency.setValueAtTime(165, t);
+    osc.frequency.exponentialRampToValueAtTime(45, t + 0.12);
 
     final web.GainNode g = ctx.createGain();
-    g.gain.setValueAtTime(volume, now);
-    g.gain.exponentialRampToValueAtTime(0.0008, now + 0.18);
+    g.gain.setValueAtTime(volume, t);
+    g.gain.exponentialRampToValueAtTime(0.0008, t + 0.18);
 
     osc.connect(g);
     g.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.2);
+    osc.start(t);
+    osc.stop(t + 0.2);
   }
 
   void playHat(double volume) {
     final web.AudioContext? ctx = _ctx;
     if (ctx == null) return;
     _resume(ctx);
-    final double now = ctx.currentTime;
+    final double t = ctx.currentTime + 0.018;
 
     // Hi-hat approssimato con un breve burst acuto.
     final web.OscillatorNode osc = ctx.createOscillator();
@@ -90,13 +83,13 @@ class AudioManager {
     osc.frequency.value = 8000;
 
     final web.GainNode g = ctx.createGain();
-    g.gain.setValueAtTime(volume * 0.3, now);
-    g.gain.exponentialRampToValueAtTime(0.0005, now + 0.04);
+    g.gain.setValueAtTime(volume * 0.3, t);
+    g.gain.exponentialRampToValueAtTime(0.0005, t + 0.04);
 
     osc.connect(g);
     g.connect(ctx.destination);
-    osc.start(now);
-    osc.stop(now + 0.05);
+    osc.start(t);
+    osc.stop(t + 0.05);
   }
 
   void startBgm() {}
