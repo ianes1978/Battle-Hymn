@@ -18,6 +18,8 @@ dependencies:
   audioplayers: ^6.0.0
   # Conversione di tracciati SVG in Path (chiave di violino vettoriale)
   path_drawing: ^1.0.1
+  # Web Audio API del browser (audio affidabile sul web)
+  web: ^1.1.0
 
 dev_dependencies:
   flutter_test:
