@@ -1,3 +1,6 @@
+/// Preset di difficoltà scelto nel menu.
+enum Difficulty { facile, normale, difficile }
+
 /// Modalità di etichetta mostrata su note, nemici e tastiera.
 enum LabelMode {
   /// Nomi solfeggiati: Do, Re, Mi, Fa, Sol, La, Si.
@@ -22,4 +25,7 @@ class GameSettings {
   /// Moltiplicatore di velocità/tempo scelto prima della partita.
   /// < 1 rallenta (più facile), > 1 accelera. 1.0 = normale.
   double speed = 1.0;
+
+  /// Preset di difficoltà (regola danno, ritmo, finestre, vite iniziali...).
+  Difficulty difficulty = Difficulty.normale;
 }

@@ -26,8 +26,11 @@ pianoforte** e il mago lancia una magia che lo distrugge.
   - **5 gemme → +1 vita**;
   - nota-bersaglio che raggiunge la linea non suonata → **Miss**, perdi HP.
 - A **0 HP**: se hai una vita, la consumi e continui; altrimenti **game over**.
-- **Opzioni nel menu**: etichette (Solfège / Lettere / Nessuna) e colori della
-  tastiera (ON/OFF). La difficoltà cresce nel tempo.
+- **Opzioni nel menu** (prima di giocare): **difficoltà** (Facile / Normale /
+  Difficile — regola danno, ritmo, finestre per le gemme, vite iniziali e numero
+  massimo di nemici), **velocità** (Lento / Normale / Veloce), **etichette**
+  (Solfège / Lettere / Nessuna) e **colori tastiera** (ON/OFF). La difficoltà
+  cresce comunque nel tempo.
 
 ---
 

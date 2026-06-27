@@ -5,6 +5,7 @@ import 'package:flame/components.dart';
 import '../game/battle_hymn_game.dart';
 import '../game/config.dart';
 import '../game/note_data.dart';
+import '../game/tuning.dart';
 
 /// Sistema di spawn: decide QUANDO generare un nuovo beat (nota + nemico) e con
 /// quali parametri, facendo crescere la difficoltà nel tempo.
@@ -25,10 +26,20 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
 
     _timer += dt;
     if (_timer >= _nextInterval) {
+      // Non superare il tetto di nemici contemporanei: riprova al frame dopo.
+      if (_activeCount() >= Tuning.maxConcurrent) return;
       _timer = 0;
       _spawnBeat();
       _scheduleNext();
     }
+  }
+
+  int _activeCount() {
+    int c = 0;
+    for (final NoteData n in game.notes) {
+      if (n.isActive) c++;
+    }
+    return c;
   }
 
   void _scheduleNext() {
@@ -39,7 +50,10 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
       d,
     );
     // Velocità scelta dal giocatore: < 1 rallenta (intervalli più lunghi).
-    _nextInterval = base * (0.8 + _rng.nextDouble() * 0.4) / game.settings.speed;
+    _nextInterval = base *
+        (0.8 + _rng.nextDouble() * 0.4) *
+        Tuning.spawnScale /
+        game.settings.speed;
   }
 
   void _spawnBeat() {
@@ -65,11 +79,13 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
 
     final double d = game.state.difficulty;
     // Più alta la velocità, più breve il tempo per raggiungere la linea.
+    // durationScale (difficoltà) e speed (scelta utente) si compongono.
     final double duration = _lerp(
-      GameConfig.initialNoteDuration,
-      GameConfig.minNoteDuration,
-      d,
-    ) /
+          GameConfig.initialNoteDuration,
+          GameConfig.minNoteDuration,
+          d,
+        ) *
+        Tuning.durationScale /
         game.settings.speed;
 
     game.spawnBeat(NoteData(

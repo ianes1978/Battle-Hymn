@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'config.dart';
 import 'note_data.dart';
+import 'tuning.dart';
 
 /// Stato di gioco mutabile: vita, vite extra, gemme, punteggio, combo, timer.
 class GameState {
@@ -124,7 +125,7 @@ class GameState {
   /// Registra un miss: danno al mago, combo azzerata. Se l'HP arriva a 0 e ci
   /// sono vite, ne consuma una e continua; altrimenti è game over.
   void registerMiss() {
-    hp = (hp - GameConfig.missDamage).clamp(0, GameConfig.maxHp);
+    hp = (hp - Tuning.missDamage).clamp(0, GameConfig.maxHp);
     combo = 0;
     _addFlash(const Color(0xFFFF5252), 0.28);
     _addShake(9);
@@ -168,5 +169,5 @@ class GameState {
   }
 
   double get difficulty =>
-      (survivalTime / GameConfig.difficultyRampSeconds).clamp(0.0, 1.0);
+      (survivalTime / Tuning.rampSeconds).clamp(0.0, 1.0);
 }

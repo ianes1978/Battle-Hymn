@@ -20,6 +20,7 @@ import 'config.dart';
 import 'game_state.dart';
 import 'note_data.dart';
 import 'settings.dart';
+import 'tuning.dart';
 
 /// Identificatori degli overlay (schermate Flutter sopra il gioco).
 class Overlays {
@@ -103,8 +104,10 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
 
   /// Avvia una nuova partita da capo.
   void startGame() {
+    Tuning.apply(settings.difficulty);
     _clearBeats();
     state.reset();
+    state.lives = Tuning.startLives; // vite iniziali secondo la difficoltà
     spawner.reset();
     overlays.remove(Overlays.menu);
     overlays.remove(Overlays.gameOver);

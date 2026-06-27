@@ -47,6 +47,19 @@ class _MenuOverlayState extends State<MenuOverlay> {
             ),
             const SizedBox(height: 22),
 
+            // --- Opzione: difficoltà ---
+            _label('Difficoltà'),
+            _segment<Difficulty>(
+              current: settings.difficulty,
+              options: const {
+                Difficulty.facile: 'Facile',
+                Difficulty.normale: 'Normale',
+                Difficulty.difficile: 'Difficile',
+              },
+              onSelect: (v) => setState(() => settings.difficulty = v),
+            ),
+            const SizedBox(height: 14),
+
             // --- Opzione: etichette ---
             _label('Etichette'),
             _segment<LabelMode>(

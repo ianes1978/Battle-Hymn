@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'config.dart';
+import 'tuning.dart';
 
 /// Esito del tempismo quando si colpisce una nota.
 enum Judgment { perfect, good, early, miss, none }
@@ -47,8 +48,8 @@ class NoteData {
   /// Giudizio in base al tempismo. Il colpo riesce sempre: se la nota è ancora
   /// lontana il giudizio è [Judgment.early] (nessuna gemma).
   Judgment evaluate() {
-    if (timeRemaining <= GameConfig.perfectWindow) return Judgment.perfect;
-    if (timeRemaining <= GameConfig.goodWindow) return Judgment.good;
+    if (timeRemaining <= Tuning.perfectWindow) return Judgment.perfect;
+    if (timeRemaining <= Tuning.goodWindow) return Judgment.good;
     return Judgment.early;
   }
 }
