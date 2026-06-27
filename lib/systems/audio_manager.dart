@@ -21,6 +21,12 @@ class AudioManager {
   int _next = 0;
   bool _ready = false;
 
+  // Base ritmica (kick + hi-hat) sintetizzata.
+  Uint8List? _kick;
+  Uint8List? _hat;
+  final List<AudioPlayer> _drumPool = [];
+  int _drumNext = 0;
+
   /// Prepara i WAV delle note e il pool di player.
   Future<void> init(int noteCount) async {
     for (int i = 0; i < noteCount; i++) {
@@ -32,6 +38,16 @@ class AudioManager {
       await p.setReleaseMode(ReleaseMode.stop);
       _pool.add(p);
     }
+
+    // Base ritmica.
+    _kick = _buildKickWav();
+    _hat = _buildHatWav();
+    for (int i = 0; i < 4; i++) {
+      final AudioPlayer p = AudioPlayer();
+      await p.setReleaseMode(ReleaseMode.stop);
+      _drumPool.add(p);
+    }
+
     _ready = true;
   }
 
@@ -47,7 +63,22 @@ class AudioManager {
         .catchError((_) {});
   }
 
-  // Nessuna musica di sottofondo per ora: no-op.
+  /// Suona il kick (battito forte) della base ritmica.
+  void playKick(double volume) => _playDrum(_kick, volume);
+
+  /// Suona l'hi-hat (battito leggero) della base ritmica.
+  void playHat(double volume) => _playDrum(_hat, volume);
+
+  void _playDrum(Uint8List? wav, double volume) {
+    if (!_ready || wav == null) return;
+    final AudioPlayer player = _drumPool[_drumNext];
+    _drumNext = (_drumNext + 1) % _drumPool.length;
+    player
+        .play(BytesSource(wav, mimeType: 'audio/wav'), volume: volume)
+        .catchError((_) {});
+  }
+
+  // La base ritmica è guidata dai beat (vedi Spawner): nessun loop separato.
   void startBgm() {}
   void stopBgm() {}
 
@@ -76,6 +107,36 @@ class AudioManager {
       samples[i] = amp.toInt();
     }
     return _wrapWav(samples);
+  }
+
+  /// Kick: sinusoide grave con caduta di intonazione e decadimento rapido.
+  Uint8List _buildKickWav() {
+    const double dur = 0.18;
+    final int n = (_sampleRate * dur).round();
+    final Int16List s = Int16List(n);
+    for (int i = 0; i < n; i++) {
+      final double t = i / _sampleRate;
+      final double env = exp(-t / 0.05);
+      final double freq = 120 * exp(-t / 0.03) + 45; // da ~165Hz a 45Hz
+      final double v = sin(2 * pi * freq * t) * env;
+      s[i] = (v * 0.9 * 32767).clamp(-32768.0, 32767.0).toInt();
+    }
+    return _wrapWav(s);
+  }
+
+  /// Hi-hat: breve burst di rumore con decadimento velocissimo.
+  Uint8List _buildHatWav() {
+    const double dur = 0.05;
+    final int n = (_sampleRate * dur).round();
+    final Int16List s = Int16List(n);
+    final Random r = Random(12345);
+    for (int i = 0; i < n; i++) {
+      final double t = i / _sampleRate;
+      final double env = exp(-t / 0.012);
+      final double v = (r.nextDouble() * 2 - 1) * env;
+      s[i] = (v * 0.5 * 32767).clamp(-32768.0, 32767.0).toInt();
+    }
+    return _wrapWav(s);
   }
 
   /// Aggiunge l'intestazione WAV ai campioni PCM.

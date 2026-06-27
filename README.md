@@ -105,10 +105,14 @@ bianchi: A   S   D   F   G   H   J   K   (Do Re Mi Fa Sol La Si Do²)
 
 ## Audio
 
-I suoni delle note sono **sintetizzati a runtime** (toni generati via codice,
-uno per ciascuna delle 12 note): non serve alcun file e non c'è materiale
-protetto da copyright. Partono al primo tasto/tocco (i browser richiedono un
-gesto utente per l'audio). Per ora **non** c'è musica di sottofondo.
+Tutto l'audio è **sintetizzato a runtime** (nessun file, nessun copyright):
+- i **suoni delle note** (uno per ciascuna delle 12 classi);
+- una **base ritmica** (kick + hi-hat) scandita sul BPM scelto;
+- le note seguono una **melodia in tonalità** (Do maggiore) e arrivano **a
+  tempo** sulla linea, con un **crescendo** che aggiunge l'hi-hat al salire
+  della combo.
+
+Parte al primo tasto/tocco (i browser richiedono un gesto utente per l'audio).
 
 > Nota: i campioni di pianoforte CC0 in `assets/audio/` non sono più necessari;
 > la cartella resta disponibile per un eventuale uso futuro.

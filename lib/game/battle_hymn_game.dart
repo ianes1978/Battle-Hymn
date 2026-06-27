@@ -47,6 +47,9 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   /// Ricalcolata ogni frame in [update].
   NoteData? activeTarget;
 
+  /// Pulsazione a tempo (0..1): impostata a 1 a ogni beat, decade nel frame.
+  double beatPulse = 0;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -89,6 +92,7 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
     super.update(dt);
     state.update(dt);
     _recomputeTarget();
+    if (beatPulse > 0) beatPulse = (beatPulse - dt * 4).clamp(0.0, 1.0);
 
     // Transizione a game over.
     if (state.isGameOver && !overlays.isActive(Overlays.gameOver)) {
