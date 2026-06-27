@@ -16,6 +16,8 @@ dependencies:
   flame: ^1.18.0
   # Riproduzione audio (qui usata per i toni delle note sintetizzati a runtime)
   audioplayers: ^6.0.0
+  # Conversione di tracciati SVG in Path (chiave di violino vettoriale)
+  path_drawing: ^1.0.1
 
 dev_dependencies:
   flutter_test:
