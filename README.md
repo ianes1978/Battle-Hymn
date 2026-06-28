@@ -28,7 +28,7 @@ pianoforte** e il mago lancia una magia che lo distrugge.
 - A **0 HP**: se hai una vita, la consumi e continui; altrimenti **game over**.
 - **Opzioni nel menu** (prima di giocare): **difficoltà** (Facile / Normale /
   Difficile — regola danno, ritmo, finestre per le gemme, vite iniziali e numero
-  massimo di nemici), **tempo** (slider in BPM, 60–200), **etichette**
+  massimo di nemici), **tempo** (slider in BPM, 30–200), **etichette**
   (Solfège / Lettere / Nessuna) e **colori tastiera** (ON/OFF). La difficoltà
   cresce comunque nel tempo.
 

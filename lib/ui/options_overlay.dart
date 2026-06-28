@@ -61,9 +61,9 @@ class _OptionsOverlayState extends State<OptionsOverlay> {
             _label('Tempo: ${s.bpm.round()} BPM'),
             _slider(
               value: s.bpm,
-              min: 60,
+              min: 30,
               max: 200,
-              divisions: 28,
+              divisions: 34, // passo di 5 BPM
               label: '${s.bpm.round()} BPM',
               onChanged: (v) => setState(() => s.bpm = v),
             ),
