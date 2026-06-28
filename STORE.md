@@ -283,8 +283,10 @@ Pegue a varinha, encontre o ritmo e transforme música em magia.
 - **Categoria**: Giochi → *Musica* (oppure *Arcade*)
 - **Tag**: rhythm, music, arcade, bullet heaven, piano
 - **Email di contatto**: roberto.ianes.78@gmail.com
-- **URL informativa privacy**: pubblica [`PRIVACY.md`](PRIVACY.md) a un URL
-  (es. GitHub Pages) e incolla qui il link
+- **URL informativa privacy**:
+  `https://ianes1978.github.io/Battle-Hymn/privacy.html`
+  (pubblicata automaticamente dal deploy web — sorgente in
+  [`store/privacy.html`](store/privacy.html))
 - **Classificazione contenuti**: compila il questionario IARC (il gioco non ha
   contenuti sensibili → fascia per tutti)
 - **Data safety**: nessun dato personale raccolto; acquisto in-app facoltativo
@@ -295,4 +297,30 @@ Pegue a varinha, encontre o ritmo e transforme música em magia.
 - **Feature graphic**: 1024×500 PNG/JPG
 - **Screenshot telefono**: almeno 2 (verticale), consigliati 4–8
 - (Facoltativo) **Screenshot tablet** 7" e 10"
+
+### Prompt per la feature graphic (1024×500)
+
+Da incollare in un generatore di immagini AI (es. lo stesso servizio con cui hai
+fatto logo e icona). Palette fredda coerente col gioco (blu notte, azzurro
+ghiaccio, ciano, tocchi d'oro).
+
+**Prompt (EN, consigliato):**
+```
+Wide banner key art for a mobile game, 1024x500, landscape. A hooded wizard in
+deep cobalt-blue robes stands lower-center, raising a glowing staff with a
+cyan-green orb. Behind him, a sweeping musical staff with treble clef and
+glowing notes flows across a starry midnight-blue sky; some notes morph into
+small geometric crystalline enemies streaking inward from the edges. A sliver of
+a piano keyboard (white and black keys) glows along the bottom edge. Cold color
+palette: midnight blue #0E1636 background, ice-blue #2BA8E0 and cyan #7FE3FF
+highlights, small warm gold #FFD54F sparkles. Clean modern vector / soft-glow
+digital art, magical and rhythmic mood, balanced composition, NO text, leave the
+left third less busy for an overlaid logo. High detail, crisp, vibrant.
+```
+
+**Consigli:**
+- Genera **senza testo** e sovrapponi tu il logo `title.png` (lascia il terzo
+  sinistro più libero per quello).
+- Esporta a **1024×500** esatti (oppure ritaglia a quel rapporto).
+- Evita marchi/loghi di terzi nell'immagine.
 ```

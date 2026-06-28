@@ -59,6 +59,11 @@ jobs:
       - name: Build web (release)
         run: flutter build web --release --base-href "/Battle-Hymn/"
 
+      # Pagina privacy pubblica (URL stabile per la Play Console):
+      # https://ianes1978.github.io/Battle-Hymn/privacy.html
+      - name: Pubblica l'informativa privacy
+        run: cp store/privacy.html build/web/privacy.html
+
       # Richiede che GitHub Pages sia già abilitato nelle impostazioni del repo
       # con "Source: GitHub Actions" (operazione una-tantum, vedi README).
       - name: Configura Pages
