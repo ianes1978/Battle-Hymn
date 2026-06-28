@@ -36,9 +36,10 @@ pianoforte** e il mago lancia una magia che lo distrugge.
 
 ## Lingua
 
-L'interfaccia è **multilingua (italiano / inglese)** e segue automaticamente la
-lingua del dispositivo: italiano se il sistema è in italiano, **inglese** in
-tutti gli altri casi. Le stringhe sono in [`lib/i18n/strings.dart`](lib/i18n/strings.dart).
+L'interfaccia è **multilingua** e segue automaticamente la lingua del
+dispositivo. Lingue supportate: **inglese, italiano, spagnolo, francese,
+tedesco, portoghese**; per qualsiasi altra lingua si usa l'**inglese**. Le
+stringhe sono in [`lib/i18n/strings.dart`](lib/i18n/strings.dart).
 
 ## Requisiti
 
