@@ -20,6 +20,8 @@ dependencies:
   path_drawing: ^1.0.1
   # Web Audio API del browser (audio affidabile sul web)
   web: ^1.1.0
+  # Salvataggio locale (record / high score)
+  shared_preferences: ^2.2.0
 
 dev_dependencies:
   flutter_test:

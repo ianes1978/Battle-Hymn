@@ -4,6 +4,7 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/background.dart';
 import '../components/enemy.dart';
@@ -51,10 +52,23 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   /// Pulsazione a tempo (0..1): impostata a 1 a ogni beat, decade nel frame.
   double beatPulse = 0;
 
+  /// Record (high score) persistente e flag "nuovo record" dell'ultima partita.
+  int highScore = 0;
+  bool newRecord = false;
+  SharedPreferences? _prefs;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
     await audio.init(GameConfig.classCount);
+
+    // Record salvato localmente.
+    try {
+      _prefs = await SharedPreferences.getInstance();
+      highScore = _prefs?.getInt('highScore') ?? 0;
+    } catch (_) {
+      highScore = 0;
+    }
 
     wizard = Wizard();
     keyboard = PianoKeyboard();
@@ -97,6 +111,12 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
 
     // Transizione a game over.
     if (state.isGameOver && !overlays.isActive(Overlays.gameOver)) {
+      // Aggiorna il record se superato.
+      newRecord = state.score > highScore;
+      if (newRecord) {
+        highScore = state.score;
+        _prefs?.setInt('highScore', highScore);
+      }
       overlays.add(Overlays.gameOver);
       audio.stopBgm();
       pauseEngine();

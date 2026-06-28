@@ -22,6 +22,12 @@ class GameState {
   /// Gemme totali raccolte nella partita (statistica).
   int totalGems = 0;
 
+  // Conteggi per accuratezza e voto finale.
+  int perfectCount = 0;
+  int goodCount = 0;
+  int earlyCount = 0;
+  int missCount = 0;
+
   double survivalTime = 0;
 
   bool isGameOver = false;
@@ -77,6 +83,10 @@ class GameState {
     gems = 0;
     lives = 0;
     totalGems = 0;
+    perfectCount = 0;
+    goodCount = 0;
+    earlyCount = 0;
+    missCount = 0;
     survivalTime = 0;
     isGameOver = false;
     isPaused = false;
@@ -112,6 +122,16 @@ class GameState {
       }
     }
 
+    // Conteggi per accuratezza.
+    switch (judgment) {
+      case Judgment.perfect:
+        perfectCount++;
+      case Judgment.good:
+        goodCount++;
+      default:
+        earlyCount++;
+    }
+
     // Feedback in base al giudizio.
     if (judgment == Judgment.perfect) {
       _addFlash(const Color(0xFFFFD54F), 0.18);
@@ -127,6 +147,7 @@ class GameState {
   void registerMiss() {
     hp = (hp - Tuning.missDamage).clamp(0, GameConfig.maxHp);
     combo = 0;
+    missCount++;
     _addFlash(const Color(0xFFFF5252), 0.28);
     _addShake(9);
     _flashJudgment(Judgment.miss);
@@ -170,4 +191,21 @@ class GameState {
 
   double get difficulty =>
       (survivalTime / Tuning.rampSeconds).clamp(0.0, 1.0);
+
+  /// Numero totale di "giudizi" (colpi + miss).
+  int get _judged => perfectCount + goodCount + earlyCount + missCount;
+
+  /// Accuratezza 0..1 (peso ai colpi a tempo: Perfect/Good).
+  double get accuracy =>
+      _judged == 0 ? 1.0 : (perfectCount + goodCount) / _judged;
+
+  /// Voto finale in base all'accuratezza.
+  String get grade {
+    final double a = accuracy;
+    if (a >= 0.95) return 'S';
+    if (a >= 0.85) return 'A';
+    if (a >= 0.70) return 'B';
+    if (a >= 0.50) return 'C';
+    return 'D';
+  }
 }

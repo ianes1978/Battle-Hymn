@@ -30,10 +30,22 @@ class GameOverOverlay extends StatelessWidget {
               letterSpacing: 3,
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
+          _gradeBadge(state.grade),
+          const SizedBox(height: 12),
           _stat('Punteggio', '${state.score}'),
+          _stat('Accuratezza', '${(state.accuracy * 100).round()}%'),
           _stat('Combo migliore', '${state.bestCombo}x'),
           _stat('Sopravvissuto', time),
+          const SizedBox(height: 8),
+          if (game.newRecord)
+            const Text('NUOVO RECORD!',
+                style: TextStyle(
+                    color: Color(0xFF7FE3FF),
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold))
+          else
+            _stat('Record', '${game.highScore}'),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: game.startGame,
@@ -55,6 +67,31 @@ class GameOverOverlay extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _gradeBadge(String grade) {
+    final Color c = switch (grade) {
+      'S' => const Color(0xFFFFD54F),
+      'A' => const Color(0xFF7FE3FF),
+      'B' => const Color(0xFF66BB6A),
+      'C' => const Color(0xFFB0BEC5),
+      _ => const Color(0xFFEF9A9A),
+    };
+    return Container(
+      width: 88,
+      height: 88,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(color: c, width: 4),
+        color: c.withValues(alpha: 0.15),
+      ),
+      child: Text(
+        grade,
+        style: TextStyle(
+            color: c, fontSize: 52, fontWeight: FontWeight.bold),
       ),
     );
   }

@@ -27,6 +27,11 @@ class MenuOverlay extends StatelessWidget {
             const SizedBox(height: 4),
             const Text('rhythm bullet-heaven',
                 style: TextStyle(fontSize: 16, color: Color(0xFF7FE3FF))),
+            if (game.highScore > 0) ...[
+              const SizedBox(height: 6),
+              Text('Record: ${game.highScore}',
+                  style: const TextStyle(fontSize: 15, color: Colors.white70)),
+            ],
             const SizedBox(height: 18),
             Text(
               'Colpisci la nota EVIDENZIATA premendo il tasto giusto.\n'
