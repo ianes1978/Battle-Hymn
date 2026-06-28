@@ -54,17 +54,35 @@ class MenuOverlay extends StatelessWidget {
               child: const Text('GIOCA'),
             ),
             const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: game.openOptions,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF7FE3FF),
-                side: const BorderSide(color: Color(0xFF4FC3F7)),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                textStyle:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              child: const Text('OPZIONI'),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                OutlinedButton(
+                  onPressed: game.openOptions,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF7FE3FF),
+                    side: const BorderSide(color: Color(0xFF4FC3F7)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 22, vertical: 12),
+                    textStyle: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  child: const Text('OPZIONI'),
+                ),
+                const SizedBox(width: 10),
+                OutlinedButton(
+                  onPressed: game.openUpgrades,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: const Color(0xFF7FE3FF),
+                    side: const BorderSide(color: Color(0xFF4FC3F7)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 22, vertical: 12),
+                    textStyle: const TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.bold),
+                  ),
+                  child: const Text('POTENZIAMENTI'),
+                ),
+              ],
             ),
           ],
         ),

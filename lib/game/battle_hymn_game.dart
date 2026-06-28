@@ -22,11 +22,13 @@ import 'game_state.dart';
 import 'note_data.dart';
 import 'settings.dart';
 import 'tuning.dart';
+import 'upgrades.dart';
 
 /// Identificatori degli overlay (schermate Flutter sopra il gioco).
 class Overlays {
   static const String menu = 'menu';
   static const String options = 'options';
+  static const String upgrades = 'upgrades';
   static const String pause = 'pause';
   static const String gameOver = 'gameOver';
 }
@@ -57,6 +59,12 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   bool newRecord = false;
   SharedPreferences? _prefs;
 
+  /// Progressione roguelite (cristalli + potenziamenti persistenti).
+  final Upgrades upgrades = Upgrades();
+
+  /// Cristalli guadagnati nell'ultima partita (per la schermata game over).
+  int lastCrystalsEarned = 0;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -66,6 +74,7 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
     try {
       _prefs = await SharedPreferences.getInstance();
       highScore = _prefs?.getInt('highScore') ?? 0;
+      if (_prefs != null) upgrades.load(_prefs!);
     } catch (_) {
       highScore = 0;
     }
@@ -117,6 +126,11 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
         highScore = state.score;
         _prefs?.setInt('highScore', highScore);
       }
+      // Cristalli roguelite guadagnati.
+      lastCrystalsEarned = Upgrades.crystalsFor(state.score);
+      upgrades.crystals += lastCrystalsEarned;
+      if (_prefs != null) upgrades.save(_prefs!);
+
       overlays.add(Overlays.gameOver);
       audio.stopBgm();
       pauseEngine();
@@ -138,6 +152,22 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
     overlays.add(Overlays.menu);
   }
 
+  /// Apre/chiude la schermata Potenziamenti (dal menu).
+  void openUpgrades() {
+    overlays.remove(Overlays.menu);
+    overlays.add(Overlays.upgrades);
+  }
+
+  void closeUpgrades() {
+    overlays.remove(Overlays.upgrades);
+    overlays.add(Overlays.menu);
+  }
+
+  /// Salva la progressione roguelite (chiamato dalla schermata Potenziamenti).
+  void saveUpgrades() {
+    if (_prefs != null) upgrades.save(_prefs!);
+  }
+
   /// Applica le impostazioni audio (volume / on-off).
   void applyAudioSettings() {
     audio.master = settings.volume;
@@ -148,9 +178,10 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   void startGame() {
     applyAudioSettings();
     Tuning.apply(settings.difficulty);
+    upgrades.applyToTuning(); // potenziamenti roguelite sopra la difficoltà
     _clearBeats();
     state.reset();
-    state.lives = Tuning.startLives; // vite iniziali secondo la difficoltà
+    state.lives = Tuning.startLives; // vite iniziali (difficoltà + potenziamenti)
     spawner.reset();
     overlays.remove(Overlays.menu);
     overlays.remove(Overlays.gameOver);

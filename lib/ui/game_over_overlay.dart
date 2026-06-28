@@ -46,6 +46,12 @@ class GameOverOverlay extends StatelessWidget {
                     fontWeight: FontWeight.bold))
           else
             _stat('Record', '${game.highScore}'),
+          const SizedBox(height: 4),
+          Text('💎 +${game.lastCrystalsEarned} cristalli',
+              style: const TextStyle(
+                  color: Color(0xFF7FE3FF),
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold)),
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: game.startGame,
