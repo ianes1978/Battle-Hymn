@@ -22,10 +22,14 @@ class AudioManager {
   bool enabled = true;
 
   // Base ritmica (kick + hi-hat) sintetizzata.
+  // Player DEDICATI e PRE-CARICATI: su Android riavviare con seek(0)+resume()
+  // un suono già caricato evita i drop/troncamenti del play(BytesSource) ripetuto.
   Uint8List? _kick;
   Uint8List? _hat;
-  final List<AudioPlayer> _drumPool = [];
-  int _drumNext = 0;
+  final List<AudioPlayer> _kickPlayers = [];
+  final List<AudioPlayer> _hatPlayers = [];
+  int _kickNext = 0;
+  int _hatNext = 0;
 
   // Basso (una nota grave per classe).
   static const double _bassBaseFreq = 65.41; // Do2
@@ -46,13 +50,19 @@ class AudioManager {
       _pool.add(p);
     }
 
-    // Base ritmica (pool dedicato, separato dalle note).
+    // Base ritmica: player dedicati e pre-caricati (kick e hi-hat separati).
     _kick = _buildKickWav();
     _hat = _buildHatWav();
-    for (int i = 0; i < 6; i++) {
-      final AudioPlayer p = AudioPlayer();
-      await p.setReleaseMode(ReleaseMode.stop);
-      _drumPool.add(p);
+    for (int i = 0; i < 3; i++) {
+      final AudioPlayer kp = AudioPlayer();
+      await kp.setReleaseMode(ReleaseMode.stop);
+      await kp.setSource(BytesSource(_kick!, mimeType: 'audio/wav'));
+      _kickPlayers.add(kp);
+
+      final AudioPlayer hp = AudioPlayer();
+      await hp.setReleaseMode(ReleaseMode.stop);
+      await hp.setSource(BytesSource(_hat!, mimeType: 'audio/wav'));
+      _hatPlayers.add(hp);
     }
 
     // Basso (12 classi a ottava grave) + pool dedicato.
@@ -82,17 +92,24 @@ class AudioManager {
   }
 
   /// Suona il kick (battito forte) della base ritmica.
-  void playKick(double volume) => _playDrum(_kick, volume);
+  void playKick(double volume) =>
+      _retrigger(_kickPlayers, () => _kickNext, (v) => _kickNext = v, volume);
 
   /// Suona l'hi-hat (battito leggero) della base ritmica.
-  void playHat(double volume) => _playDrum(_hat, volume);
+  void playHat(double volume) =>
+      _retrigger(_hatPlayers, () => _hatNext, (v) => _hatNext = v, volume);
 
-  void _playDrum(Uint8List? wav, double volume) {
-    if (!enabled || !_ready || wav == null) return;
-    final AudioPlayer player = _drumPool[_drumNext];
-    _drumNext = (_drumNext + 1) % _drumPool.length;
+  /// Riavvia un suono pre-caricato: imposta volume, torna all'inizio e riparte.
+  void _retrigger(List<AudioPlayer> pool, int Function() getIdx,
+      void Function(int) setIdx, double volume) {
+    if (!enabled || !_ready || pool.isEmpty) return;
+    final AudioPlayer player = pool[getIdx() % pool.length];
+    setIdx((getIdx() + 1) % pool.length);
+    player.setVolume((volume * master).clamp(0.0, 1.0));
+    // seek(0) poi resume: ordine garantito dall'await interno della catena.
     player
-        .play(BytesSource(wav, mimeType: 'audio/wav'), volume: volume * master)
+        .seek(Duration.zero)
+        .then((_) => player.resume())
         .catchError((_) {});
   }
 
