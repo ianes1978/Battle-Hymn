@@ -139,6 +139,74 @@ Al termine il gioco sarà online su:
 > Il `base-href` nel workflow è impostato a `/Battle-Hymn/`; se rinomini il repo,
 > aggiornalo di conseguenza.
 
+## Pubblicazione Android (APK / Play Store)
+
+L'app è configurata con `applicationId = com.ianes.battlehymn` e nome
+**Battle Hymn** (vedi [`tool/configure_android.sh`](tool/configure_android.sh)).
+
+### APK di prova (subito, senza firma di rilascio)
+
+Il workflow [`.github/workflows/android.yml`](.github/workflows/android.yml)
+builda un **APK** ad ogni push e lo pubblica come artifact (e come Release
+`v0.1.0`). Va bene per installarlo a mano sul telefono, **non** per il Play
+Store.
+
+### AAB firmato per il Play Store
+
+Google Play richiede un **Android App Bundle (`.aab`) firmato** con la *tua*
+chiave. Il workflow [`.github/workflows/release.yml`](.github/workflows/release.yml)
+lo produce. La chiave di firma **resta solo tua**: non è mai nel repository,
+viene letta dai *GitHub Secrets*.
+
+**1. Crea il keystore** (una volta sola, sul tuo PC con la JDK installata):
+
+```bash
+keytool -genkey -v -keystore battlehymn-upload.jks \
+  -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+```
+
+Conserva il file `battlehymn-upload.jks` e le password **in un posto sicuro**:
+se le perdi non potrai più aggiornare l'app sul Play Store.
+
+**2. Converti il keystore in base64** (per incollarlo come segreto):
+
+```bash
+base64 -w0 battlehymn-upload.jks > keystore.b64   # Linux
+# macOS:  base64 -i battlehymn-upload.jks -o keystore.b64
+```
+
+**3. Aggiungi i GitHub Secrets** (Settings → Secrets and variables → Actions →
+*New repository secret*):
+
+| Nome del segreto            | Valore                                   |
+|-----------------------------|------------------------------------------|
+| `ANDROID_KEYSTORE_BASE64`   | il contenuto di `keystore.b64`           |
+| `ANDROID_KEYSTORE_PASSWORD` | la password dello *store*                |
+| `ANDROID_KEY_ALIAS`         | `upload` (o l'alias scelto)              |
+| `ANDROID_KEY_PASSWORD`      | la password della *chiave*               |
+
+**4. Genera l'AAB**: tab **Actions → Build AAB (Play Store) → Run workflow**.
+Al termine scarica l'artifact `battle-hymn-aab` (`app-release.aab`).
+
+**5. Carica su Google Play**: nella
+[Play Console](https://play.google.com/console) crea l'app, compila la scheda
+e in *Produzione → Crea nuova release* carica `app-release.aab`.
+
+> Suggerimento: con **Play App Signing** (consigliato da Google) la chiave qui
+> sopra è la tua chiave di *upload*; Google gestisce la chiave finale di firma.
+
+### Materiali per la scheda Play Store (checklist)
+
+- **Informativa privacy**: [`PRIVACY.md`](PRIVACY.md) — pubblicala a un URL
+  (es. GitHub Pages) e incolla il link nella Play Console. Il gioco **non
+  raccoglie dati personali**.
+- **Icona** 512×512 (generata da [`flutter_launcher_icons`]).
+- **Feature graphic** 1024×500.
+- **Screenshot** del telefono (almeno 2, in verticale).
+- **Descrizione** breve e lunga, categoria (Giochi → Musica/Arcade),
+  classificazione contenuti (questionario IARC), Paese e prezzo.
+- **Data safety form**: dichiara "nessun dato raccolto/condiviso".
+
 ## Struttura del progetto
 
 ```

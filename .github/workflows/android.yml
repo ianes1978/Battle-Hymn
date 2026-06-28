@@ -34,6 +34,9 @@ jobs:
       - name: Genera le cartelle di piattaforma (android)
         run: flutter create --platforms=android .
 
+      - name: Configura applicationId e nome app
+        run: bash tool/configure_android.sh
+
       - name: Installa le dipendenze
         run: flutter pub get
 

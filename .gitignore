@@ -18,6 +18,12 @@ pubspec.lock
 .DS_Store
 Thumbs.db
 
+# Firma Android: NON committare MAI keystore/credenziali (restano solo tuoi)
+*.jks
+*.keystore
+**/key.properties
+keystore.b64
+
 # Piattaforme generate da `flutter create .` (rigenerabili)
 # Decommenta se NON vuoi versionarle:
 # android/
