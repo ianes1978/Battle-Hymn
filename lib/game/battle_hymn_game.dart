@@ -25,6 +25,7 @@ import 'tuning.dart';
 /// Identificatori degli overlay (schermate Flutter sopra il gioco).
 class Overlays {
   static const String menu = 'menu';
+  static const String options = 'options';
   static const String pause = 'pause';
   static const String gameOver = 'gameOver';
 }
@@ -106,8 +107,26 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   // Flusso di gioco
   // ---------------------------------------------------------------------------
 
+  /// Apre/chiude la schermata Opzioni (dal menu).
+  void openOptions() {
+    overlays.remove(Overlays.menu);
+    overlays.add(Overlays.options);
+  }
+
+  void closeOptions() {
+    overlays.remove(Overlays.options);
+    overlays.add(Overlays.menu);
+  }
+
+  /// Applica le impostazioni audio (volume / on-off).
+  void applyAudioSettings() {
+    audio.master = settings.volume;
+    audio.enabled = settings.audioEnabled;
+  }
+
   /// Avvia una nuova partita da capo.
   void startGame() {
+    applyAudioSettings();
     Tuning.apply(settings.difficulty);
     _clearBeats();
     state.reset();

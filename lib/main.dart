@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'game/battle_hymn_game.dart';
 import 'ui/game_over_overlay.dart';
 import 'ui/menu_overlay.dart';
+import 'ui/options_overlay.dart';
 import 'ui/pause_overlay.dart';
 
 /// Punto di ingresso dell'applicazione.
@@ -33,6 +34,7 @@ void main() {
             initialActiveOverlays: const [Overlays.menu],
             overlayBuilderMap: {
               Overlays.menu: (context, g) => MenuOverlay(game: g),
+              Overlays.options: (context, g) => OptionsOverlay(game: g),
               Overlays.pause: (context, g) => PauseOverlay(game: g),
               Overlays.gameOver: (context, g) => GameOverOverlay(game: g),
             },

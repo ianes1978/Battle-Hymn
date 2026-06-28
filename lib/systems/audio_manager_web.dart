@@ -9,6 +9,10 @@ import 'package:web/web.dart' as web;
 class AudioManager {
   static const double _baseFreq = 261.626; // Do4
 
+  /// Volume generale (0..1) e on/off, impostati dalle opzioni.
+  double master = 0.8;
+  bool enabled = true;
+
   web.AudioContext? _ctx;
 
   Future<void> init(int noteCount) async {
@@ -28,7 +32,7 @@ class AudioManager {
 
   void playNote(int noteClass) {
     final web.AudioContext? ctx = _ctx;
-    if (ctx == null) return;
+    if (!enabled || ctx == null) return;
     _resume(ctx);
 
     final double freq = _baseFreq * pow(2, (noteClass % 12) / 12).toDouble();
@@ -41,7 +45,7 @@ class AudioManager {
 
     final web.GainNode g = ctx.createGain();
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.45, t + 0.006); // attacco lineare
+    g.gain.linearRampToValueAtTime(0.45 * master, t + 0.006); // attacco
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.45); // decadimento
 
     osc.connect(g);
@@ -52,7 +56,7 @@ class AudioManager {
 
   void playBass(int noteClass, double volume) {
     final web.AudioContext? ctx = _ctx;
-    if (ctx == null) return;
+    if (!enabled || ctx == null) return;
     _resume(ctx);
     final double freq = 65.41 * pow(2, (noteClass % 12) / 12).toDouble(); // Do2
     final double t = ctx.currentTime + 0.018;
@@ -63,7 +67,7 @@ class AudioManager {
 
     final web.GainNode g = ctx.createGain();
     g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(volume, t + 0.01);
+    g.gain.linearRampToValueAtTime(volume * master, t + 0.01);
     g.gain.exponentialRampToValueAtTime(0.001, t + 0.38);
 
     osc.connect(g);
@@ -74,7 +78,7 @@ class AudioManager {
 
   void playKick(double volume) {
     final web.AudioContext? ctx = _ctx;
-    if (ctx == null) return;
+    if (!enabled || ctx == null) return;
     _resume(ctx);
     final double t = ctx.currentTime + 0.018;
 
@@ -84,7 +88,7 @@ class AudioManager {
     osc.frequency.exponentialRampToValueAtTime(45, t + 0.12);
 
     final web.GainNode g = ctx.createGain();
-    g.gain.setValueAtTime(volume, t);
+    g.gain.setValueAtTime(volume * master, t);
     g.gain.exponentialRampToValueAtTime(0.0008, t + 0.18);
 
     osc.connect(g);
@@ -95,7 +99,7 @@ class AudioManager {
 
   void playHat(double volume) {
     final web.AudioContext? ctx = _ctx;
-    if (ctx == null) return;
+    if (!enabled || ctx == null) return;
     _resume(ctx);
     final double t = ctx.currentTime + 0.018;
 
@@ -105,7 +109,7 @@ class AudioManager {
     osc.frequency.value = 8000;
 
     final web.GainNode g = ctx.createGain();
-    g.gain.setValueAtTime(volume * 0.3, t);
+    g.gain.setValueAtTime(volume * 0.3 * master, t);
     g.gain.exponentialRampToValueAtTime(0.0005, t + 0.04);
 
     osc.connect(g);

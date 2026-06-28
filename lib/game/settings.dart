@@ -31,4 +31,10 @@ class GameSettings {
 
   /// Preset di difficoltà (regola danno, ritmo, finestre, vite iniziali...).
   Difficulty difficulty = Difficulty.normale;
+
+  /// Audio attivo/disattivato.
+  bool audioEnabled = true;
+
+  /// Volume generale (0..1).
+  double volume = 0.8;
 }

@@ -17,6 +17,10 @@ class AudioManager {
   int _next = 0;
   bool _ready = false;
 
+  /// Volume generale (0..1) e on/off, impostati dalle opzioni.
+  double master = 0.8;
+  bool enabled = true;
+
   // Base ritmica (kick + hi-hat) sintetizzata.
   Uint8List? _kick;
   Uint8List? _hat;
@@ -66,13 +70,14 @@ class AudioManager {
 
   /// Riproduce il tono della classe di nota indicata.
   void playNote(int noteClass) {
-    if (!_ready || _noteWavs.isEmpty) return;
+    if (!enabled || !_ready || _noteWavs.isEmpty) return;
     final int c = noteClass % _noteWavs.length;
     final AudioPlayer player = _pool[_next];
     _next = (_next + 1) % _pool.length;
     // Fire-and-forget: eventuali errori (es. player occupato) sono ignorati.
     player
-        .play(BytesSource(_noteWavs[c], mimeType: 'audio/wav'), volume: 0.7)
+        .play(BytesSource(_noteWavs[c], mimeType: 'audio/wav'),
+            volume: 0.7 * master)
         .catchError((_) {});
   }
 
@@ -83,22 +88,23 @@ class AudioManager {
   void playHat(double volume) => _playDrum(_hat, volume);
 
   void _playDrum(Uint8List? wav, double volume) {
-    if (!_ready || wav == null) return;
+    if (!enabled || !_ready || wav == null) return;
     final AudioPlayer player = _drumPool[_drumNext];
     _drumNext = (_drumNext + 1) % _drumPool.length;
     player
-        .play(BytesSource(wav, mimeType: 'audio/wav'), volume: volume)
+        .play(BytesSource(wav, mimeType: 'audio/wav'), volume: volume * master)
         .catchError((_) {});
   }
 
   /// Suona la nota di basso (classe a ottava grave).
   void playBass(int noteClass, double volume) {
-    if (!_ready || _bassWavs.isEmpty) return;
+    if (!enabled || !_ready || _bassWavs.isEmpty) return;
     final int c = noteClass % _bassWavs.length;
     final AudioPlayer player = _bassPool[_bassNext];
     _bassNext = (_bassNext + 1) % _bassPool.length;
     player
-        .play(BytesSource(_bassWavs[c], mimeType: 'audio/wav'), volume: volume)
+        .play(BytesSource(_bassWavs[c], mimeType: 'audio/wav'),
+            volume: volume * master)
         .catchError((_) {});
   }
 
