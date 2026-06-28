@@ -30,6 +30,11 @@ class Tuning {
   /// Numero massimo di nemici contemporaneamente attivi.
   static int maxConcurrent = 8;
 
+  /// Quali "dinamiche" di nemici sono attive (dipende dalla difficoltà).
+  static bool allowFast = true;
+  static bool allowArmored = true;
+  static bool allowBoss = true;
+
   /// Imposta i parametri secondo il preset scelto.
   static void apply(Difficulty d) {
     switch (d) {
@@ -42,6 +47,9 @@ class Tuning {
         rampSeconds = GameConfig.difficultyRampSeconds * 1.6;
         startLives = 1;
         maxConcurrent = 5;
+        allowFast = false;
+        allowArmored = false;
+        allowBoss = false;
         break;
       case Difficulty.normale:
         perfectWindow = GameConfig.perfectWindow;
@@ -52,6 +60,9 @@ class Tuning {
         rampSeconds = GameConfig.difficultyRampSeconds;
         startLives = 0;
         maxConcurrent = 8;
+        allowFast = true;
+        allowArmored = true;
+        allowBoss = false;
         break;
       case Difficulty.difficile:
         perfectWindow = GameConfig.perfectWindow * 0.8;
@@ -62,6 +73,9 @@ class Tuning {
         rampSeconds = GameConfig.difficultyRampSeconds * 0.7;
         startLives = 0;
         maxConcurrent = 12;
+        allowFast = true;
+        allowArmored = true;
+        allowBoss = true;
         break;
     }
   }

@@ -58,6 +58,17 @@ class _MenuOverlayState extends State<MenuOverlay> {
               },
               onSelect: (v) => setState(() => settings.difficulty = v),
             ),
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                switch (settings.difficulty) {
+                  Difficulty.facile => 'Solo nemici base',
+                  Difficulty.normale => '+ veloci e corazzati',
+                  Difficulty.difficile => '+ mini-boss (tutto)',
+                },
+                style: const TextStyle(color: Colors.white54, fontSize: 11),
+              ),
+            ),
             const SizedBox(height: 14),
 
             // --- Opzione: etichette ---

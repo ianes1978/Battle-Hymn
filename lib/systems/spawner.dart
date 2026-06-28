@@ -106,17 +106,20 @@ class Spawner extends Component with HasGameReference<BattleHymnGame> {
 
   /// Decide tipo, colpi richiesti e variazione di velocità (in beat).
   (EnemyType, int, int) _pickType(double d) {
-    // Mini-boss periodico (se non ce n'è già uno e c'è un minimo di difficoltà).
+    // Mini-boss periodico (se abilitato, non ce n'è già uno e c'è difficoltà).
     final bool bossActive =
         game.notes.any((n) => n.isActive && n.type == EnemyType.boss);
-    if (!bossActive && d > 0.15 && _songTime - _lastBossTime > 28) {
+    if (Tuning.allowBoss &&
+        !bossActive &&
+        d > 0.15 &&
+        _songTime - _lastBossTime > 28) {
       _lastBossTime = _songTime;
       return (EnemyType.boss, 4, 3); // lento e resistente
     }
 
     final double r = _rng.nextDouble();
-    final double pFast = 0.30 * d;
-    final double pArmored = 0.25 * d;
+    final double pFast = Tuning.allowFast ? 0.30 * d : 0;
+    final double pArmored = Tuning.allowArmored ? 0.25 * d : 0;
     if (r < pFast) {
       return (EnemyType.fast, 1, -2); // veloce
     }
