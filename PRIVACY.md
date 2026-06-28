@@ -38,9 +38,15 @@ sugli altoparlanti del dispositivo.
 
 ## Pubblicità e acquisti
 
-L'app non contiene pubblicità di terze parti né acquisti in-app. I
-"cristalli" e i "potenziamenti" sono valori di gioco ottenuti giocando e non
-comportano alcuna spesa reale.
+L'app non contiene pubblicità di terze parti. I "cristalli" e i
+"potenziamenti" sono valori di gioco ottenuti giocando e non comportano alcuna
+spesa reale.
+
+È presente un **acquisto in-app facoltativo** ("Offrimi un caffè"): una mancia
+di supporto allo sviluppo che **non sblocca alcun contenuto**. Il pagamento è
+gestito interamente da **Google Play**; lo sviluppatore non riceve né conserva
+i tuoi dati di pagamento. Per i dettagli sul trattamento dei dati di pagamento
+fai riferimento all'informativa privacy di Google.
 
 ## Minori
 

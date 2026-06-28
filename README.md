@@ -202,6 +202,33 @@ e in *Produzione → Crea nuova release* carica `app-release.aab`.
 > Suggerimento: con **Play App Signing** (consigliato da Google) la chiave qui
 > sopra è la tua chiave di *upload*; Google gestisce la chiave finale di firma.
 
+### Acquisto in-app "Offrimi un caffè" (mancia)
+
+Il gioco è **gratuito**. C'è un pulsante facoltativo **☕ Offrimi un caffè** che
+avvia un acquisto in-app (mancia) tramite **Google Play Billing**: non sblocca
+nulla, supporta solo lo sviluppo. È un prodotto **consumabile**, quindi può
+essere ripetuto. Sul web il pulsante è nascosto (lì il billing non esiste).
+
+Per attivarlo devi creare il prodotto nella Play Console:
+
+1. Play Console → la tua app → **Monetizza → Prodotti → Prodotti in-app →
+   Crea prodotto**.
+2. **ID prodotto**: `coffee_tip` (deve combaciare con
+   `IapManager.coffeeProductId` in
+   [`lib/systems/iap_manager.dart`](lib/systems/iap_manager.dart)).
+3. Tipo **consumabile**, nome (es. "Caffè"), prezzo ~**1,00 €**, stato
+   **attivo**.
+4. Pubblica l'app almeno in **test interno**: il billing funziona solo su build
+   firmate scaricate da Google Play (non sull'APK installato a mano). Aggiungi
+   il tuo account come tester.
+
+Finché il prodotto non è attivo e l'app non è distribuita da Play, il pulsante
+resta nascosto automaticamente (billing non disponibile).
+
+> Nota policy: trattandosi di un acquisto in-app gestito da Google Play, è
+> conforme alle regole dello Store. Dichiara l'acquisto facoltativo nel form
+> *Data safety* (il pagamento è gestito da Google).
+
 ### Materiali per la scheda Play Store (checklist)
 
 - **Informativa privacy**: [`PRIVACY.md`](PRIVACY.md) — pubblicala a un URL

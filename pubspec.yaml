@@ -22,6 +22,8 @@ dependencies:
   web: ^1.1.0
   # Salvataggio locale (record / high score)
   shared_preferences: ^2.2.0
+  # Acquisti in-app (pulsante "Offrimi un caffè" su Android via Play Billing)
+  in_app_purchase: ^3.2.0
 
 dev_dependencies:
   flutter_test:

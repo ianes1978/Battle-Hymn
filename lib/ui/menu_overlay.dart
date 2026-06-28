@@ -2,11 +2,51 @@ import 'package:flutter/material.dart';
 
 import '../game/battle_hymn_game.dart';
 import '../i18n/strings.dart';
+import '../systems/iap_manager.dart';
 
 /// Schermata iniziale: titolo, regole, GIOCA e accesso alle Opzioni.
-class MenuOverlay extends StatelessWidget {
+class MenuOverlay extends StatefulWidget {
   final BattleHymnGame game;
   const MenuOverlay({super.key, required this.game});
+
+  @override
+  State<MenuOverlay> createState() => _MenuOverlayState();
+}
+
+class _MenuOverlayState extends State<MenuOverlay> {
+  BattleHymnGame get game => widget.game;
+
+  @override
+  void initState() {
+    super.initState();
+    game.iap.lastResult.addListener(_onCoffeeResult);
+  }
+
+  @override
+  void dispose() {
+    game.iap.lastResult.removeListener(_onCoffeeResult);
+    super.dispose();
+  }
+
+  void _onCoffeeResult() {
+    final CoffeeResult? r = game.iap.lastResult.value;
+    if (r == null || !mounted) return;
+    final String msg = switch (r) {
+      CoffeeResult.thanks => L.coffeeThanks,
+      CoffeeResult.pending => L.coffeePending,
+      CoffeeResult.canceled => '',
+      CoffeeResult.error => L.coffeeError,
+    };
+    game.iap.lastResult.value = null; // consuma l'evento
+    if (msg.isEmpty) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        backgroundColor: const Color(0xFF13203B),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +124,25 @@ class MenuOverlay extends StatelessWidget {
                 ),
               ],
             ),
+            // Pulsante "Offrimi un caffè": solo se il billing è disponibile
+            // (Android con prodotto configurato). Nascosto sul web.
+            if (game.iap.available) ...[
+              const SizedBox(height: 14),
+              TextButton.icon(
+                onPressed: game.iap.buyCoffee,
+                icon: const Text('☕', style: TextStyle(fontSize: 16)),
+                label: Text(
+                  game.iap.price != null
+                      ? '${L.coffee} (${game.iap.price})'
+                      : L.coffee,
+                ),
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFFFFD54F),
+                  textStyle: const TextStyle(
+                      fontSize: 14, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ],
         ),
       ),

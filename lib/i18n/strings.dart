@@ -438,6 +438,43 @@ class L {
   static String get ok => 'OK';
   static String get miss => 'MISS';
 
+  // --- Caffè (mancia in-app) ------------------------------------------------
+  static String get coffee => _p({
+        Lang.en: 'Buy me a coffee',
+        Lang.it: 'Offrimi un caffè',
+        Lang.es: 'Invítame a un café',
+        Lang.fr: 'Offre-moi un café',
+        Lang.de: 'Spendier mir einen Kaffee',
+        Lang.pt: 'Pague-me um café',
+      });
+
+  static String get coffeeThanks => _p({
+        Lang.en: 'Thanks for the coffee! ☕',
+        Lang.it: 'Grazie per il caffè! ☕',
+        Lang.es: '¡Gracias por el café! ☕',
+        Lang.fr: 'Merci pour le café ! ☕',
+        Lang.de: 'Danke für den Kaffee! ☕',
+        Lang.pt: 'Obrigado pelo café! ☕',
+      });
+
+  static String get coffeePending => _p({
+        Lang.en: 'Processing…',
+        Lang.it: 'In elaborazione…',
+        Lang.es: 'Procesando…',
+        Lang.fr: 'Traitement…',
+        Lang.de: 'Wird verarbeitet…',
+        Lang.pt: 'Processando…',
+      });
+
+  static String get coffeeError => _p({
+        Lang.en: 'Purchase not available right now.',
+        Lang.it: 'Acquisto non disponibile al momento.',
+        Lang.es: 'Compra no disponible ahora.',
+        Lang.fr: 'Achat indisponible pour le moment.',
+        Lang.de: 'Kauf derzeit nicht verfügbar.',
+        Lang.pt: 'Compra indisponível no momento.',
+      });
+
   // --- Banner ---------------------------------------------------------------
   static String get lifeGained => _p({
         Lang.en: '+1 LIFE!',

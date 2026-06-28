@@ -16,6 +16,7 @@ import '../components/staff.dart';
 import '../components/wizard.dart';
 import '../input/key_mapping.dart';
 import '../systems/audio_manager.dart';
+import '../systems/iap_manager.dart';
 import '../systems/spawner.dart';
 import 'config.dart';
 import 'game_state.dart';
@@ -39,6 +40,9 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   final GameState state = GameState();
   final GameSettings settings = GameSettings();
   final AudioManager audio = AudioManager();
+
+  /// Acquisto in-app facoltativo "Offrimi un caffè" (mancia, solo Android).
+  final IapManager iap = IapManager();
 
   late final Wizard wizard;
   late final PianoKeyboard keyboard;
@@ -69,6 +73,9 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   Future<void> onLoad() async {
     await super.onLoad();
     await audio.init(GameConfig.classCount);
+
+    // Inizializza il billing (no-op sul web / se non disponibile).
+    iap.init();
 
     // Record salvato localmente.
     try {
