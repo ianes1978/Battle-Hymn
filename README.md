@@ -151,6 +151,11 @@ Al termine il gioco sarà online su:
 L'app è configurata con `applicationId = com.ianes.battlehymn` e nome
 **Battle Hymn** (vedi [`tool/configure_android.sh`](tool/configure_android.sh)).
 
+> 📋 **Per pubblicare segui la guida passo-passo:**
+> [`PUBLISHING.md`](PUBLISHING.md) — checklist in ordine dalla creazione del
+> keystore fino all'invio in revisione. Le sezioni qui sotto sono il dettaglio
+> tecnico di riferimento.
+
 ### APK di prova (subito, senza firma di rilascio)
 
 Il workflow [`.github/workflows/android.yml`](.github/workflows/android.yml)
