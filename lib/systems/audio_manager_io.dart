@@ -132,6 +132,7 @@ class AudioManager {
       final double amp = (s * env * 0.6 * 32767).clamp(-32768.0, 32767.0);
       samples[i] = amp.toInt();
     }
+    _fadeOut(samples);
     return _wrapWav(samples);
   }
 
@@ -146,6 +147,7 @@ class AudioManager {
       final double v = sin(2 * pi * freq * t) * env;
       s[i] = (v * 0.9 * 32767).clamp(-32768.0, 32767.0).toInt();
     }
+    _fadeOut(s);
     return _wrapWav(s);
   }
 
@@ -163,6 +165,7 @@ class AudioManager {
       v /= 1.3;
       s[i] = (v * env * 0.8 * 32767).clamp(-32768.0, 32767.0).toInt();
     }
+    _fadeOut(s);
     return _wrapWav(s);
   }
 
@@ -178,6 +181,15 @@ class AudioManager {
       s[i] = (v * 0.5 * 32767).clamp(-32768.0, 32767.0).toInt();
     }
     return _wrapWav(s);
+  }
+
+  /// Dissolvenza finale (anti-click): porta a zero gli ultimi millisecondi.
+  void _fadeOut(Int16List s, {double seconds = 0.012}) {
+    final int r = min(s.length, (_sampleRate * seconds).round());
+    for (int i = 0; i < r; i++) {
+      final int idx = s.length - r + i;
+      s[idx] = (s[idx] * (1 - i / r)).toInt();
+    }
   }
 
   Uint8List _wrapWav(Int16List samples) {

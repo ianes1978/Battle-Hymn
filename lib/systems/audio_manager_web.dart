@@ -1,4 +1,6 @@
+import 'dart:js_interop';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:web/web.dart' as web;
 
@@ -88,7 +90,8 @@ class AudioManager {
     osc.frequency.exponentialRampToValueAtTime(45, t + 0.12);
 
     final web.GainNode g = ctx.createGain();
-    g.gain.setValueAtTime(volume * master, t);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(volume * master, t + 0.004); // attacco morbido
     g.gain.exponentialRampToValueAtTime(0.0008, t + 0.18);
 
     osc.connect(g);
@@ -103,19 +106,33 @@ class AudioManager {
     _resume(ctx);
     final double t = ctx.currentTime + 0.018;
 
-    // Hi-hat approssimato con un breve burst acuto.
-    final web.OscillatorNode osc = ctx.createOscillator();
-    osc.type = 'square';
-    osc.frequency.value = 8000;
+    // Hi-hat realistico: breve burst di rumore bianco filtrato (passa-alto),
+    // morbido e "ticchettante" invece dell'onda quadra dura di prima.
+    final int len = (ctx.sampleRate * 0.05).round();
+    final web.AudioBuffer buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    final Float32List data = Float32List(len);
+    final Random r = Random();
+    final double decay = ctx.sampleRate * 0.012;
+    for (int i = 0; i < len; i++) {
+      data[i] = (r.nextDouble() * 2 - 1) * exp(-i / decay);
+    }
+    buf.copyToChannel(data.toJS, 0);
+
+    final web.AudioBufferSourceNode src = ctx.createBufferSource();
+    src.buffer = buf;
+
+    final web.BiquadFilterNode hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 7000;
 
     final web.GainNode g = ctx.createGain();
-    g.gain.setValueAtTime(volume * 0.3 * master, t);
-    g.gain.exponentialRampToValueAtTime(0.0005, t + 0.04);
+    g.gain.value = volume * 0.16 * master;
 
-    osc.connect(g);
+    src.connect(hp);
+    hp.connect(g);
     g.connect(ctx.destination);
-    osc.start(t);
-    osc.stop(t + 0.05);
+    src.start(t);
+    src.stop(t + 0.06);
   }
 
   void startBgm() {}
