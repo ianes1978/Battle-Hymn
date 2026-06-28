@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'game/battle_hymn_game.dart';
+import 'i18n/strings.dart';
 import 'ui/game_over_overlay.dart';
 import 'ui/menu_overlay.dart';
 import 'ui/options_overlay.dart';
@@ -12,6 +13,9 @@ import 'ui/upgrades_overlay.dart';
 /// Punto di ingresso dell'applicazione.
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
+  // Lingua dell'interfaccia: italiano se il sistema è in italiano, altrimenti
+  // inglese.
+  L.detect();
   // Orientamento verticale (portrait) su mobile.
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,

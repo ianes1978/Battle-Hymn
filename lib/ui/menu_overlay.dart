@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../game/battle_hymn_game.dart';
+import '../i18n/strings.dart';
 
 /// Schermata iniziale: titolo, regole, GIOCA e accesso alle Opzioni.
 class MenuOverlay extends StatelessWidget {
@@ -25,17 +26,16 @@ class MenuOverlay extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            const Text('rhythm bullet-heaven',
-                style: TextStyle(fontSize: 16, color: Color(0xFF7FE3FF))),
+            Text(L.tagline,
+                style: const TextStyle(fontSize: 16, color: Color(0xFF7FE3FF))),
             if (game.highScore > 0) ...[
               const SizedBox(height: 6),
-              Text('Record: ${game.highScore}',
+              Text('${L.record}: ${game.highScore}',
                   style: const TextStyle(fontSize: 15, color: Colors.white70)),
             ],
             const SizedBox(height: 18),
             Text(
-              'Colpisci la nota EVIDENZIATA premendo il tasto giusto.\n'
-              'Conta la nota, non l\'ottava. A tempo = gemma; 5 gemme = +1 vita.',
+              L.menuHint,
               textAlign: TextAlign.center,
               style: TextStyle(
                   fontSize: 14, color: Colors.white.withValues(alpha: 0.85)),
@@ -51,7 +51,7 @@ class MenuOverlay extends StatelessWidget {
                 textStyle:
                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              child: const Text('GIOCA'),
+              child: Text(L.play),
             ),
             const SizedBox(height: 12),
             Row(
@@ -67,7 +67,7 @@ class MenuOverlay extends StatelessWidget {
                     textStyle: const TextStyle(
                         fontSize: 15, fontWeight: FontWeight.bold),
                   ),
-                  child: const Text('OPZIONI'),
+                  child: Text(L.options),
                 ),
                 const SizedBox(width: 10),
                 OutlinedButton(
@@ -80,7 +80,7 @@ class MenuOverlay extends StatelessWidget {
                     textStyle: const TextStyle(
                         fontSize: 15, fontWeight: FontWeight.bold),
                   ),
-                  child: const Text('POTENZIAMENTI'),
+                  child: Text(L.upgrades),
                 ),
               ],
             ),

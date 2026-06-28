@@ -5,6 +5,7 @@ import '../game/battle_hymn_game.dart';
 import '../game/config.dart';
 import '../game/game_state.dart';
 import '../game/note_data.dart';
+import '../i18n/strings.dart';
 
 /// Interfaccia di gioco: HP, vite, gemme, punteggio, combo, timer, giudizi.
 class Hud extends Component with HasGameReference<BattleHymnGame> {
@@ -30,11 +31,11 @@ class Hud extends Component with HasGameReference<BattleHymnGame> {
     // Punteggio (in alto a destra).
     _text(canvas, '${s.score}', Offset(w - 16, 16), 26,
         align: TextAlign.right, color: Colors.white, bold: true);
-    _text(canvas, 'PUNTEGGIO', Offset(w - 16, 46), 11,
+    _text(canvas, L.scoreLabel, Offset(w - 16, 46), 11,
         align: TextAlign.right, color: Colors.white60);
 
     if (s.combo > 1) {
-      _text(canvas, '${s.combo}x COMBO', Offset(w - 16, 70), 16,
+      _text(canvas, '${s.combo}x ${L.combo}', Offset(w - 16, 70), 16,
           align: TextAlign.right, color: Colors.amberAccent, bold: true);
     }
 
@@ -92,10 +93,10 @@ class Hud extends Component with HasGameReference<BattleHymnGame> {
     if (s.lastJudgmentTimer <= 0 || s.lastJudgment == Judgment.none) return;
     final double a = (s.lastJudgmentTimer / 0.8).clamp(0.0, 1.0);
     final (String label, Color color) = switch (s.lastJudgment) {
-      Judgment.perfect => ('PERFECT  +GEMMA', Colors.amberAccent),
-      Judgment.good => ('GOOD  +GEMMA', Colors.lightGreenAccent),
-      Judgment.early => ('OK', Colors.white70),
-      Judgment.miss => ('MISS', Colors.redAccent),
+      Judgment.perfect => (L.perfect, Colors.amberAccent),
+      Judgment.good => (L.good, Colors.lightGreenAccent),
+      Judgment.early => (L.ok, Colors.white70),
+      Judgment.miss => (L.miss, Colors.redAccent),
       Judgment.none => ('', Colors.white),
     };
     _text(canvas, label, Offset(game.size.x / 2, game.size.y * 0.40 - (1 - a) * 20),

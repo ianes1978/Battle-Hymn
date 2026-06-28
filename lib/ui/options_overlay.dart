@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../game/battle_hymn_game.dart';
 import '../game/settings.dart';
+import '../i18n/strings.dart';
 
 /// Schermata Opzioni: difficoltà, tempo, etichette, colori e audio.
 class OptionsOverlay extends StatefulWidget {
@@ -24,9 +25,9 @@ class _OptionsOverlayState extends State<OptionsOverlay> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'OPZIONI',
-              style: TextStyle(
+            Text(
+              L.optionsTitle,
+              style: const TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -35,13 +36,13 @@ class _OptionsOverlayState extends State<OptionsOverlay> {
             ),
             const SizedBox(height: 18),
 
-            _label('Difficoltà'),
+            _label(L.difficulty),
             _segment<Difficulty>(
               current: s.difficulty,
-              options: const {
-                Difficulty.facile: 'Facile',
-                Difficulty.normale: 'Normale',
-                Difficulty.difficile: 'Difficile',
+              options: {
+                Difficulty.facile: L.easy,
+                Difficulty.normale: L.normal,
+                Difficulty.difficile: L.hard,
               },
               onSelect: (v) => setState(() => s.difficulty = v),
             ),
@@ -49,16 +50,16 @@ class _OptionsOverlayState extends State<OptionsOverlay> {
               padding: const EdgeInsets.only(top: 4),
               child: Text(
                 switch (s.difficulty) {
-                  Difficulty.facile => 'Solo nemici base',
-                  Difficulty.normale => '+ veloci e corazzati',
-                  Difficulty.difficile => '+ mini-boss (tutto)',
+                  Difficulty.facile => L.diffHintEasy,
+                  Difficulty.normale => L.diffHintNormal,
+                  Difficulty.difficile => L.diffHintHard,
                 },
                 style: const TextStyle(color: Colors.white54, fontSize: 11),
               ),
             ),
             const SizedBox(height: 14),
 
-            _label('Tempo: ${s.bpm.round()} BPM'),
+            _label(L.tempo(s.bpm.round())),
             _slider(
               value: s.bpm,
               min: 30,
@@ -69,45 +70,45 @@ class _OptionsOverlayState extends State<OptionsOverlay> {
             ),
             const SizedBox(height: 14),
 
-            _label('Etichette'),
+            _label(L.labels),
             _segment<LabelMode>(
               current: s.labelMode,
-              options: const {
+              options: {
                 LabelMode.solfege: 'Do Re Mi',
                 LabelMode.letters: 'C D E',
-                LabelMode.none: 'Nessuna',
+                LabelMode.none: L.labelsNone,
               },
               onSelect: (v) => setState(() => s.labelMode = v),
             ),
             const SizedBox(height: 14),
 
-            _label('Colori tastiera'),
+            _label(L.keyboardColors),
             _segment<bool>(
               current: s.keyboardColors,
-              options: const {true: 'ON', false: 'OFF'},
+              options: {true: L.on, false: L.off},
               onSelect: (v) => setState(() => s.keyboardColors = v),
             ),
             const SizedBox(height: 18),
 
             // --- Audio ---
-            const Text('AUDIO',
-                style: TextStyle(
-                    color: const Color(0xFF2BA8E0),
+            Text(L.audio,
+                style: const TextStyle(
+                    color: Color(0xFF2BA8E0),
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2)),
             const SizedBox(height: 8),
-            _label('Suono'),
+            _label(L.sound),
             _segment<bool>(
               current: s.audioEnabled,
-              options: const {true: 'ON', false: 'OFF'},
+              options: {true: L.on, false: L.off},
               onSelect: (v) => setState(() {
                 s.audioEnabled = v;
                 widget.game.applyAudioSettings();
               }),
             ),
             const SizedBox(height: 10),
-            _label('Volume: ${(s.volume * 100).round()}%'),
+            _label(L.volume((s.volume * 100).round())),
             _slider(
               value: s.volume,
               min: 0,
@@ -131,7 +132,7 @@ class _OptionsOverlayState extends State<OptionsOverlay> {
                 textStyle:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              child: const Text('INDIETRO'),
+              child: Text(L.back),
             ),
           ],
         ),

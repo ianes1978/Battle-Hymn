@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../i18n/strings.dart';
 import 'config.dart';
 import 'note_data.dart';
 import 'tuning.dart';
@@ -115,7 +116,7 @@ class GameState {
         gems -= GameConfig.gemsPerLife;
         if (lives < GameConfig.maxLives) {
           lives += 1;
-          _showBanner('+1 VITA!');
+          _showBanner(L.lifeGained);
           _addFlash(const Color(0xFFFFD54F), 0.5);
           _addShake(6);
         }
@@ -155,7 +156,7 @@ class GameState {
       if (lives > 0) {
         lives -= 1;
         hp = GameConfig.maxHp;
-        _showBanner('VITA PERSA');
+        _showBanner(L.lifeLost);
       } else {
         isGameOver = true;
       }

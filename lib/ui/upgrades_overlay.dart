@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../game/battle_hymn_game.dart';
 import '../game/upgrades.dart';
+import '../i18n/strings.dart';
 
 /// Schermata Potenziamenti (roguelite): spendi i cristalli per migliorie
 /// permanenti applicate alle partite future.
@@ -25,9 +26,9 @@ class _UpgradesOverlayState extends State<UpgradesOverlay> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'POTENZIAMENTI',
-              style: TextStyle(
+            Text(
+              L.upgradesTitle,
+              style: const TextStyle(
                 fontSize: 30,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -35,7 +36,7 @@ class _UpgradesOverlayState extends State<UpgradesOverlay> {
               ),
             ),
             const SizedBox(height: 6),
-            Text('💎 ${u.crystals} cristalli',
+            Text('💎 ${L.crystals(u.crystals)}',
                 style: const TextStyle(
                     color: Color(0xFF7FE3FF),
                     fontSize: 18,
@@ -53,7 +54,7 @@ class _UpgradesOverlayState extends State<UpgradesOverlay> {
                 textStyle:
                     const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              child: const Text('INDIETRO'),
+              child: Text(L.back),
             ),
           ],
         ),
@@ -94,8 +95,8 @@ class _UpgradesOverlayState extends State<UpgradesOverlay> {
           ),
           const SizedBox(width: 8),
           maxed
-              ? const Text('MAX',
-                  style: TextStyle(
+              ? Text(L.max,
+                  style: const TextStyle(
                       color: Color(0xFFFFD54F), fontWeight: FontWeight.bold))
               : ElevatedButton(
                   onPressed: can

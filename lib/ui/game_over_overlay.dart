@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../game/battle_hymn_game.dart';
+import '../i18n/strings.dart';
 
 /// Schermata di game over: mostra punteggio, combo migliore e tempo, con
 /// pulsante per riprovare.
@@ -21,9 +22,9 @@ class GameOverOverlay extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'GAME OVER',
-            style: TextStyle(
+          Text(
+            L.gameOver,
+            style: const TextStyle(
               fontSize: 44,
               fontWeight: FontWeight.bold,
               color: Colors.redAccent,
@@ -33,21 +34,21 @@ class GameOverOverlay extends StatelessWidget {
           const SizedBox(height: 12),
           _gradeBadge(state.grade),
           const SizedBox(height: 12),
-          _stat('Punteggio', '${state.score}'),
-          _stat('Accuratezza', '${(state.accuracy * 100).round()}%'),
-          _stat('Combo migliore', '${state.bestCombo}x'),
-          _stat('Sopravvissuto', time),
+          _stat(L.score, '${state.score}'),
+          _stat(L.accuracy, '${(state.accuracy * 100).round()}%'),
+          _stat(L.bestCombo, '${state.bestCombo}x'),
+          _stat(L.survived, time),
           const SizedBox(height: 8),
           if (game.newRecord)
-            const Text('NUOVO RECORD!',
-                style: TextStyle(
+            Text(L.newRecord,
+                style: const TextStyle(
                     color: Color(0xFF7FE3FF),
                     fontSize: 18,
                     fontWeight: FontWeight.bold))
           else
-            _stat('Record', '${game.highScore}'),
+            _stat(L.record, '${game.highScore}'),
           const SizedBox(height: 4),
-          Text('💎 +${game.lastCrystalsEarned} cristalli',
+          Text('💎 ${L.crystalsEarned(game.lastCrystalsEarned)}',
               style: const TextStyle(
                   color: Color(0xFF7FE3FF),
                   fontSize: 15,
@@ -62,14 +63,14 @@ class GameOverOverlay extends StatelessWidget {
               textStyle:
                   const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            child: const Text('RIPROVA'),
+            child: Text(L.retry),
           ),
           const SizedBox(height: 12),
           TextButton(
             onPressed: game.goToMenu,
-            child: const Text(
-              'Menu principale',
-              style: TextStyle(color: Colors.white70, fontSize: 15),
+            child: Text(
+              L.mainMenu,
+              style: const TextStyle(color: Colors.white70, fontSize: 15),
             ),
           ),
         ],

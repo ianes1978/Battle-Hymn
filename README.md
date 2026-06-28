@@ -34,6 +34,12 @@ pianoforte** e il mago lancia una magia che lo distrugge.
 
 ---
 
+## Lingua
+
+L'interfaccia è **multilingua (italiano / inglese)** e segue automaticamente la
+lingua del dispositivo: italiano se il sistema è in italiano, **inglese** in
+tutti gli altri casi. Le stringhe sono in [`lib/i18n/strings.dart`](lib/i18n/strings.dart).
+
 ## Requisiti
 
 - [Flutter](https://docs.flutter.dev/get-started/install) (ultima stabile) con

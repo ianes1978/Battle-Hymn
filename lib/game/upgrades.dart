@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../i18n/strings.dart';
 import 'tuning.dart';
 
 /// Progressione roguelite persistente: cristalli guadagnati a fine partita e
@@ -20,18 +21,18 @@ class Upgrades {
   static const List<String> keys = ['life', 'slow', 'shield', 'luck'];
 
   static String title(String k) => switch (k) {
-        'life' => 'Vita iniziale',
-        'slow' => 'Note più lente',
-        'shield' => 'Scudo',
-        'luck' => 'Fortuna gemme',
+        'life' => L.upLifeTitle,
+        'slow' => L.upSlowTitle,
+        'shield' => L.upShieldTitle,
+        'luck' => L.upLuckTitle,
         _ => k,
       };
 
   static String describe(String k) => switch (k) {
-        'life' => '+1 vita iniziale',
-        'slow' => 'Note +8% più lente',
-        'shield' => '-15% danno da miss',
-        'luck' => 'Finestre gemma più larghe',
+        'life' => L.upLifeDesc,
+        'slow' => L.upSlowDesc,
+        'shield' => L.upShieldDesc,
+        'luck' => L.upLuckDesc,
         _ => '',
       };
 
