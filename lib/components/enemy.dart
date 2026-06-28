@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../game/battle_hymn_game.dart';
 import '../game/config.dart';
 import '../game/note_data.dart';
+import '../game/settings.dart';
 
 /// Nemico che avanza radialmente verso il mago. La posizione deriva dal
 /// [NoteData] condiviso. Il tipo ([EnemyType]) ne cambia dimensione e decori.
@@ -170,10 +171,17 @@ class Enemy extends PositionComponent with HasGameReference<BattleHymnGame> {
     // Pip dei colpi residui (corazzato/boss).
     if (note.hits > 1) _drawHitPips(canvas, r);
 
-    // Etichetta della nota.
-    final String label =
-        GameConfig.labelForClass(note.noteClass, game.settings.labelMode);
-    if (label.isNotEmpty) _drawLabel(canvas, label, note.type == EnemyType.boss);
+    // Etichetta della nota. Con l'aiuto daltonici, il bersaglio corrente mostra
+    // sempre il nome (anche se le etichette sono disattivate).
+    final bool isTarget = game.activeTarget == note;
+    LabelMode mode = game.settings.labelMode;
+    if (game.settings.colorblind && isTarget && mode == LabelMode.none) {
+      mode = LabelMode.letters;
+    }
+    final String label = GameConfig.labelForClass(note.noteClass, mode);
+    if (label.isNotEmpty) {
+      _drawLabel(canvas, label, note.type == EnemyType.boss);
+    }
   }
 
   void _drawArmorRing(Canvas canvas, double radius) {

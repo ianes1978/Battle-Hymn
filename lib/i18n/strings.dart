@@ -475,6 +475,133 @@ class L {
         Lang.pt: 'Compra indisponível no momento.',
       });
 
+  // --- Accessibilità (opzioni) ----------------------------------------------
+  static String get accessibility => _p({
+        Lang.en: 'ACCESSIBILITY',
+        Lang.it: 'ACCESSIBILITÀ',
+        Lang.es: 'ACCESIBILIDAD',
+        Lang.fr: 'ACCESSIBILITÉ',
+        Lang.de: 'BARRIEREFREIHEIT',
+        Lang.pt: 'ACESSIBILIDADE',
+      });
+
+  static String get practiceMode => _p({
+        Lang.en: 'Practice mode',
+        Lang.it: 'Modalità pratica',
+        Lang.es: 'Modo práctica',
+        Lang.fr: 'Mode entraînement',
+        Lang.de: 'Übungsmodus',
+        Lang.pt: 'Modo treino',
+      });
+
+  static String get reduceMotion => _p({
+        Lang.en: 'Reduce motion',
+        Lang.it: 'Riduci animazioni',
+        Lang.es: 'Reducir movimiento',
+        Lang.fr: 'Réduire les animations',
+        Lang.de: 'Bewegung reduzieren',
+        Lang.pt: 'Reduzir movimento',
+      });
+
+  static String get colorblind => _p({
+        Lang.en: 'Colorblind aid',
+        Lang.it: 'Aiuto daltonici',
+        Lang.es: 'Ayuda daltónicos',
+        Lang.fr: 'Aide daltoniens',
+        Lang.de: 'Farbsehhilfe',
+        Lang.pt: 'Ajuda daltônicos',
+      });
+
+  // --- Tutorial "Come si gioca" ---------------------------------------------
+  static String get howToButton => _p({
+        Lang.en: 'How to play',
+        Lang.it: 'Come si gioca',
+        Lang.es: 'Cómo jugar',
+        Lang.fr: 'Comment jouer',
+        Lang.de: 'Spielanleitung',
+        Lang.pt: 'Como jogar',
+      });
+
+  static String get howToTitle => howToButton;
+
+  static String get howToBody => _p({
+        Lang.en:
+            'Enemies arrive from every direction. Each one is a note on the '
+                'staff above the wizard.\n\n'
+                '• One note at a time is HIGHLIGHTED with a white ring — that\'s '
+                'your target.\n'
+                '• Press its key on the piano to cast a spell and destroy it.\n'
+                '• The NOTE matters, not the octave: for an A, play any A.\n'
+                '• Hit it on the beat for a GEM. 5 gems = +1 life.\n'
+                '• If a target reaches the line unplayed, you take damage.',
+        Lang.it:
+            'I nemici arrivano da ogni direzione. Ognuno è una nota sullo '
+                'spartito sopra il mago.\n\n'
+                '• Una nota alla volta è EVIDENZIATA con un anello bianco: è il '
+                'tuo bersaglio.\n'
+                '• Premi il suo tasto sul piano per lanciare una magia e '
+                'distruggerla.\n'
+                '• Conta la NOTA, non l\'ottava: per un La, premi un qualsiasi '
+                'La.\n'
+                '• Colpiscila a tempo per una GEMMA. 5 gemme = +1 vita.\n'
+                '• Se un bersaglio raggiunge la linea non suonato, subisci danno.',
+        Lang.es:
+            'Los enemigos llegan de todas las direcciones. Cada uno es una nota '
+                'del pentagrama sobre el mago.\n\n'
+                '• Una nota a la vez está RESALTADA con un anillo blanco: es tu '
+                'objetivo.\n'
+                '• Pulsa su tecla en el piano para lanzar un hechizo y '
+                'destruirla.\n'
+                '• Importa la NOTA, no la octava: para un La, toca cualquier '
+                'La.\n'
+                '• Aciértala a tiempo para una GEMA. 5 gemas = +1 vida.\n'
+                '• Si un objetivo llega a la línea sin tocar, recibes daño.',
+        Lang.fr:
+            'Les ennemis arrivent de toutes les directions. Chacun est une note '
+                'sur la portée au-dessus du magicien.\n\n'
+                '• Une note à la fois est SURLIGNÉE par un anneau blanc : c\'est '
+                'ta cible.\n'
+                '• Appuie sur sa touche au piano pour lancer un sort et la '
+                'détruire.\n'
+                '• C\'est la NOTE qui compte, pas l\'octave : pour un La, joue '
+                'n\'importe quel La.\n'
+                '• Touche-la dans le rythme pour une GEMME. 5 gemmes = +1 vie.\n'
+                '• Si une cible atteint la ligne sans être jouée, tu subis des '
+                'dégâts.',
+        Lang.de:
+            'Gegner kommen aus allen Richtungen. Jeder ist eine Note im '
+                'Notensystem über dem Magier.\n\n'
+                '• Immer eine Note ist mit einem weißen Ring HERVORGEHOBEN — '
+                'das ist dein Ziel.\n'
+                '• Drücke ihre Taste am Klavier, um einen Zauber zu wirken und '
+                'sie zu zerstören.\n'
+                '• Die NOTE zählt, nicht die Oktave: für ein A spiel irgendein '
+                'A.\n'
+                '• Triff sie im Takt für einen EDELSTEIN. 5 Edelsteine = +1 '
+                'Leben.\n'
+                '• Erreicht ein Ziel ungespielt die Linie, nimmst du Schaden.',
+        Lang.pt:
+            'Os inimigos chegam de todas as direções. Cada um é uma nota na '
+                'pauta acima do mago.\n\n'
+                '• Uma nota por vez fica DESTACADA com um anel branco: é o seu '
+                'alvo.\n'
+                '• Pressione a tecla dela no piano para lançar um feitiço e '
+                'destruí-la.\n'
+                '• Importa a NOTA, não a oitava: para um Lá, toque qualquer '
+                'Lá.\n'
+                '• Acerte no tempo para uma GEMA. 5 gemas = +1 vida.\n'
+                '• Se um alvo chegar à linha sem ser tocado, você sofre dano.',
+      });
+
+  static String get gotIt => _p({
+        Lang.en: 'GOT IT',
+        Lang.it: 'HO CAPITO',
+        Lang.es: 'ENTENDIDO',
+        Lang.fr: 'COMPRIS',
+        Lang.de: 'VERSTANDEN',
+        Lang.pt: 'ENTENDI',
+      });
+
   // --- Banner ---------------------------------------------------------------
   static String get lifeGained => _p({
         Lang.en: '+1 LIFE!',

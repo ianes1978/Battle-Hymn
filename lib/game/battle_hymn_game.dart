@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../components/background.dart';
+import '../components/burst.dart';
 import '../components/enemy.dart';
 import '../components/hud.dart';
 import '../components/note_component.dart';
@@ -32,6 +33,7 @@ class Overlays {
   static const String upgrades = 'upgrades';
   static const String pause = 'pause';
   static const String gameOver = 'gameOver';
+  static const String howTo = 'howTo';
 }
 
 /// Classe principale del gioco: orchestra componenti, input, punteggio e flusso
@@ -69,6 +71,9 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   /// Cristalli guadagnati nell'ultima partita (per la schermata game over).
   int lastCrystalsEarned = 0;
 
+  /// Vero al primissimo avvio (nessun tutorial ancora visto).
+  bool _firstRun = false;
+
   @override
   Future<void> onLoad() async {
     await super.onLoad();
@@ -77,14 +82,20 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
     // Inizializza il billing (no-op sul web / se non disponibile).
     iap.init();
 
-    // Record salvato localmente.
+    // Record + impostazioni + progressione salvati localmente.
+    bool firstRun = true;
     try {
       _prefs = await SharedPreferences.getInstance();
       highScore = _prefs?.getInt('highScore') ?? 0;
-      if (_prefs != null) upgrades.load(_prefs!);
+      if (_prefs != null) {
+        upgrades.load(_prefs!);
+        settings.load(_prefs!);
+        firstRun = !(_prefs!.getBool('seenTutorial') ?? false);
+      }
     } catch (_) {
       highScore = 0;
     }
+    _firstRun = firstRun;
 
     wizard = Wizard();
     keyboard = PianoKeyboard();
@@ -101,13 +112,20 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
 
     // Si parte dal menu, con il motore in pausa.
     overlays.add(Overlays.menu);
+    // Al primissimo avvio mostra il tutorial sopra il menu.
+    if (_firstRun) {
+      overlays.add(Overlays.howTo);
+      _prefs?.setBool('seenTutorial', true);
+    }
     pauseEngine();
   }
 
   @override
   void render(Canvas canvas) {
     // Scossa schermo: trasla tutto il rendering di un piccolo offset.
-    final Offset o = state.shakeOffset();
+    // Disattivata se "riduci animazioni" è attivo.
+    final Offset o =
+        settings.reduceMotion ? Offset.zero : state.shakeOffset();
     if (o == Offset.zero) {
       super.render(canvas);
       return;
@@ -155,6 +173,7 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   }
 
   void closeOptions() {
+    saveSettings();
     overlays.remove(Overlays.options);
     overlays.add(Overlays.menu);
   }
@@ -168,6 +187,15 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   void closeUpgrades() {
     overlays.remove(Overlays.upgrades);
     overlays.add(Overlays.menu);
+  }
+
+  /// Apre/chiude il tutorial "Come si gioca" (dal menu).
+  void openHowTo() => overlays.add(Overlays.howTo);
+  void closeHowTo() => overlays.remove(Overlays.howTo);
+
+  /// Salva le impostazioni (chiamato dalla schermata Opzioni).
+  void saveSettings() {
+    if (_prefs != null) settings.save(_prefs!);
   }
 
   /// Salva la progressione roguelite (chiamato dalla schermata Potenziamenti).
@@ -188,6 +216,7 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
     upgrades.applyToTuning(); // potenziamenti roguelite sopra la difficoltà
     _clearBeats();
     state.reset();
+    state.practice = settings.practiceMode;
     state.lives = Tuning.startLives; // vite iniziali (difficoltà + potenziamenti)
     spawner.reset();
     overlays.remove(Overlays.menu);
@@ -252,6 +281,8 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
   void onNoteReachedLine(NoteData note) {
     if (!note.isActive) return;
     note.state = BeatState.missed;
+    final Vector2? pos = _enemyPos(note);
+    if (pos != null) _burst(pos, const Color(0xFFFF5252), big: true);
     state.registerMiss();
   }
 
@@ -303,29 +334,46 @@ class BattleHymnGame extends FlameGame with KeyboardEvents {
     wizard.cast(note.angle);
     _spawnSpellTo(note);
 
+    final Vector2? pos = _enemyPos(note);
     if (note.hitsTaken >= note.hits) {
       note.state = BeatState.resolved; // distrutto
       activeTarget = null;
+      if (pos != null) _burst(pos, note.color, big: true);
+    } else if (pos != null) {
+      _burst(pos, note.color, big: false); // colpo incassato (armatura)
     }
     // Altrimenti il nemico sopravvive e resta il bersaglio (armatura).
   }
 
+  /// Posizione corrente del nemico associato a una nota (o null se assente).
+  Vector2? _enemyPos(NoteData note) {
+    for (final Enemy e in children.whereType<Enemy>()) {
+      if (e.note == note) return e.position.clone();
+    }
+    return null;
+  }
+
   /// Lancia una magia (cosmetica) dal mago verso il nemico della nota.
   void _spawnSpellTo(NoteData note) {
-    Vector2? targetPos;
-    for (final Enemy e in children.whereType<Enemy>()) {
-      if (e.note == note) {
-        targetPos = e.position.clone();
-        break;
-      }
-    }
-    targetPos ??= wizard.homePosition +
-        Vector2(cos(note.angle), sin(note.angle)) * 200;
+    final Vector2 targetPos = _enemyPos(note) ??
+        wizard.homePosition + Vector2(cos(note.angle), sin(note.angle)) * 200;
 
     add(Spell(
       start: wizard.homePosition.clone(),
       target: targetPos,
       color: note.color,
+    ));
+  }
+
+  /// Esplosione di particelle (saltata se "riduci animazioni" è attivo).
+  void _burst(Vector2 pos, Color color, {required bool big}) {
+    if (settings.reduceMotion) return;
+    add(Burst(
+      origin: pos,
+      color: color,
+      count: big ? 18 : 8,
+      speed: big ? 150 : 90,
+      maxLife: big ? 0.6 : 0.4,
     ));
   }
 

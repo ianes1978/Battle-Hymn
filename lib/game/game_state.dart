@@ -34,6 +34,9 @@ class GameState {
   bool isGameOver = false;
   bool isPaused = false;
 
+  /// Modalità pratica: gli errori non portano mai al game over.
+  bool practice = false;
+
   Judgment lastJudgment = Judgment.none;
   double lastJudgmentTimer = 0;
 
@@ -153,7 +156,10 @@ class GameState {
     _addShake(9);
     _flashJudgment(Judgment.miss);
     if (hp <= 0) {
-      if (lives > 0) {
+      if (practice) {
+        // In pratica non si muore: l'HP si ricarica e si continua.
+        hp = GameConfig.maxHp;
+      } else if (lives > 0) {
         lives -= 1;
         hp = GameConfig.maxHp;
         _showBanner(L.lifeLost);

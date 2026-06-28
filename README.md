@@ -41,6 +41,18 @@ dispositivo. Lingue supportate: **inglese, italiano, spagnolo, francese,
 tedesco, portoghese**; per qualsiasi altra lingua si usa l'**inglese**. Le
 stringhe sono in [`lib/i18n/strings.dart`](lib/i18n/strings.dart).
 
+## Accessibilità
+
+Dal menu **Opzioni → Accessibilità**:
+- **Modalità pratica**: non si muore mai, per imparare con calma.
+- **Riduci animazioni**: disattiva scossa schermo e particelle.
+- **Aiuto daltonici**: mostra sempre il nome della nota sul bersaglio corrente,
+  così non serve distinguere i colori.
+
+Al primo avvio compare un tutorial **"Come si gioca"**, richiamabile in
+qualsiasi momento dal menu. Tutte le impostazioni vengono **salvate** e
+ricaricate all'avvio.
+
 ## Requisiti
 
 - [Flutter](https://docs.flutter.dev/get-started/install) (ultima stabile) con

@@ -124,6 +124,16 @@ class _MenuOverlayState extends State<MenuOverlay> {
                 ),
               ],
             ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: game.openHowTo,
+              style: TextButton.styleFrom(
+                foregroundColor: const Color(0xFF7FE3FF),
+                textStyle:
+                    const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+              child: Text(L.howToButton),
+            ),
             // Pulsante "Offrimi un caffè": solo se il billing è disponibile
             // (Android con prodotto configurato). Nascosto sul web.
             if (game.iap.available) ...[

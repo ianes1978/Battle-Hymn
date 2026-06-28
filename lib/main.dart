@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'game/battle_hymn_game.dart';
 import 'i18n/strings.dart';
 import 'ui/game_over_overlay.dart';
+import 'ui/howto_overlay.dart';
 import 'ui/menu_overlay.dart';
 import 'ui/options_overlay.dart';
 import 'ui/pause_overlay.dart';
@@ -41,6 +42,7 @@ void main() {
               Overlays.menu: (context, g) => MenuOverlay(game: g),
               Overlays.options: (context, g) => OptionsOverlay(game: g),
               Overlays.upgrades: (context, g) => UpgradesOverlay(game: g),
+              Overlays.howTo: (context, g) => HowToOverlay(game: g),
               Overlays.pause: (context, g) => PauseOverlay(game: g),
               Overlays.gameOver: (context, g) => GameOverOverlay(game: g),
             },

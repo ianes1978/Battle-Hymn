@@ -120,6 +120,36 @@ class _OptionsOverlayState extends State<OptionsOverlay> {
                 widget.game.applyAudioSettings();
               }),
             ),
+            const SizedBox(height: 18),
+
+            // --- Accessibilità ---
+            Text(L.accessibility,
+                style: const TextStyle(
+                    color: Color(0xFF2BA8E0),
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 2)),
+            const SizedBox(height: 8),
+            _label(L.practiceMode),
+            _segment<bool>(
+              current: s.practiceMode,
+              options: {true: L.on, false: L.off},
+              onSelect: (v) => setState(() => s.practiceMode = v),
+            ),
+            const SizedBox(height: 10),
+            _label(L.reduceMotion),
+            _segment<bool>(
+              current: s.reduceMotion,
+              options: {true: L.on, false: L.off},
+              onSelect: (v) => setState(() => s.reduceMotion = v),
+            ),
+            const SizedBox(height: 10),
+            _label(L.colorblind),
+            _segment<bool>(
+              current: s.colorblind,
+              options: {true: L.on, false: L.off},
+              onSelect: (v) => setState(() => s.colorblind = v),
+            ),
             const SizedBox(height: 26),
 
             ElevatedButton(
