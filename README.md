@@ -216,8 +216,15 @@ Per attivarlo devi creare il prodotto nella Play Console:
 2. **ID prodotto**: `coffee_tip` (deve combaciare con
    `IapManager.coffeeProductId` in
    [`lib/systems/iap_manager.dart`](lib/systems/iap_manager.dart)).
-3. Tipo **consumabile**, nome (es. "Caffè"), prezzo ~**1,00 €**, stato
+3. Tipo **consumabile**, nome (es. "Caffè"), prezzo **1,18 €**, stato
    **attivo**.
+   - Perché 1,18 € e non 1,15 €: la commissione Google (15% nel programma per
+     piccoli sviluppatori) si calcola **sul prezzo di vendita**. Per incassare
+     **netto ~1,00 €** serve `1,00 ÷ 0,85 = 1,18 €` (su 1,18 € Google trattiene
+     ~0,18 €). Con 1,15 € incasseresti solo ~0,98 €.
+   - Nota IVA: nell'UE il prezzo mostrato è IVA inclusa e Google versa l'IVA per
+     tuo conto, quindi il payout reale può essere leggermente inferiore a seconda
+     del Paese dell'acquirente.
 4. Pubblica l'app almeno in **test interno**: il billing funziona solo su build
    firmate scaricate da Google Play (non sull'APK installato a mano). Aggiungi
    il tuo account come tester.
