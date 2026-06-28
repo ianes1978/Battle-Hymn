@@ -236,6 +236,12 @@ resta nascosto automaticamente (billing non disponibile).
 > conforme alle regole dello Store. Dichiara l'acquisto facoltativo nel form
 > *Data safety* (il pagamento è gestito da Google).
 
+### Testi della scheda (6 lingue, pronti da incollare)
+
+I testi della scheda Store — nome app, descrizione breve e descrizione completa
+in **inglese, italiano, spagnolo, francese, tedesco e portoghese** — sono in
+[`STORE.md`](STORE.md), già entro i limiti di caratteri di Google Play.
+
 ### Materiali per la scheda Play Store (checklist)
 
 - **Informativa privacy**: [`PRIVACY.md`](PRIVACY.md) — pubblicala a un URL
