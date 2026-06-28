@@ -38,7 +38,7 @@ class GameOverOverlay extends StatelessWidget {
           ElevatedButton(
             onPressed: game.startGame,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.amberAccent,
+              backgroundColor: const Color(0xFF2BA8E0),
               foregroundColor: Colors.black,
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
               textStyle:

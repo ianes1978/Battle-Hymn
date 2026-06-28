@@ -92,7 +92,7 @@ class _OptionsOverlayState extends State<OptionsOverlay> {
             // --- Audio ---
             const Text('AUDIO',
                 style: TextStyle(
-                    color: Colors.amberAccent,
+                    color: const Color(0xFF2BA8E0),
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 2)),
@@ -124,7 +124,7 @@ class _OptionsOverlayState extends State<OptionsOverlay> {
             ElevatedButton(
               onPressed: widget.game.closeOptions,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amberAccent,
+                backgroundColor: const Color(0xFF2BA8E0),
                 foregroundColor: Colors.black,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
@@ -156,12 +156,12 @@ class _OptionsOverlayState extends State<OptionsOverlay> {
     return SizedBox(
       width: 280,
       child: Slider(
-        value: value.clamp(min, max),
+        value: value.clamp(min, max).toDouble(),
         min: min,
         max: max,
         divisions: divisions,
         label: label,
-        activeColor: Colors.amberAccent,
+        activeColor: const Color(0xFF2BA8E0),
         onChanged: onChanged,
       ),
     );
@@ -181,7 +181,7 @@ class _OptionsOverlayState extends State<OptionsOverlay> {
           child: ElevatedButton(
             onPressed: () => onSelect(e.key),
             style: ElevatedButton.styleFrom(
-              backgroundColor: selected ? Colors.amberAccent : Colors.white24,
+              backgroundColor: selected ? const Color(0xFF2BA8E0) : Colors.white24,
               foregroundColor: selected ? Colors.black : Colors.white,
               padding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 10),

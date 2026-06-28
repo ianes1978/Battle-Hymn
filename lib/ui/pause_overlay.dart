@@ -28,7 +28,7 @@ class PauseOverlay extends StatelessWidget {
           ElevatedButton(
             onPressed: game.togglePause,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.amberAccent,
+              backgroundColor: const Color(0xFF2BA8E0),
               foregroundColor: Colors.black,
               padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 14),
               textStyle:

@@ -16,18 +16,17 @@ class MenuOverlay extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'BATTLE HYMN',
-              style: TextStyle(
-                fontSize: 46,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                letterSpacing: 4,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Image.asset(
+                'assets/images/title.png',
+                width: 340,
+                fit: BoxFit.contain,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             const Text('rhythm bullet-heaven',
-                style: TextStyle(fontSize: 16, color: Colors.amberAccent)),
+                style: TextStyle(fontSize: 16, color: Color(0xFF7FE3FF))),
             const SizedBox(height: 18),
             Text(
               'Colpisci la nota EVIDENZIATA premendo il tasto giusto.\n'
@@ -40,8 +39,8 @@ class MenuOverlay extends StatelessWidget {
             ElevatedButton(
               onPressed: game.startGame,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amberAccent,
-                foregroundColor: Colors.black,
+                backgroundColor: const Color(0xFF2BA8E0), // azzurro ghiaccio
+                foregroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
                 textStyle:
@@ -53,8 +52,8 @@ class MenuOverlay extends StatelessWidget {
             OutlinedButton(
               onPressed: game.openOptions,
               style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.white,
-                side: const BorderSide(color: Colors.white54),
+                foregroundColor: const Color(0xFF7FE3FF),
+                side: const BorderSide(color: Color(0xFF4FC3F7)),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 textStyle:
