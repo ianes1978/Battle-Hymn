@@ -42,6 +42,10 @@ jobs:
       - name: Installa le dipendenze
         run: flutter pub get
 
+      - name: Genera le icone (favicon/PWA dal logo)
+        run: dart run flutter_launcher_icons
+        continue-on-error: true
+
       - name: Analisi statica
         run: flutter analyze
         # Non blocca il deploy in caso di warning di lint.
